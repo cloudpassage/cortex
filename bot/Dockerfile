@@ -1,0 +1,84 @@
+FROM docker.io/halotools/don-bot:v0.16.0
+MAINTAINER toolbox@cloudpassage.com
+
+ENV HALO_SDK_VERSION=1.0.1
+ENV HALO_EVENTS_VERSION=v0.10.2
+ENV HALO_SCANS_VERSION=v0.11
+ENV HALO_CELERY_VERSION=master
+ENV FIREWALL_GRAPH_VERSION=v0.1
+ENV SCAN_GRAPH_VERSION=v0.1.1
+
+ENV SLACK_ICON_URL=http://www.cloudpassage.com/wp-content/uploads/2016/12/don-operator.png
+ENV HALO_API_HOSTNAME=api.cloudpassage.com
+ENV HALO_API_PORT=443
+
+RUN apk add -U --no-cache \
+    gcc==5.3.0-r0 \
+    git=2.8.3-r0 \
+    graphviz==2.38.0-r5 \
+    graphviz-dev==2.38.0-r5 \
+    linux-headers==4.4.6-r1 \
+    musl-dev==1.1.14-r14 \
+    python==2.7.12-r0 \
+    python-dev==2.7.12-r0 \
+    py-pip==8.1.2-r0
+
+
+RUN pip install \
+    boto3==1.4.3 \
+    celery[redis]==4.0.2 \
+    cloudpassage==${HALO_SDK_VERSION} \
+    flower==0.9.1 \
+    pytest==2.8.0 \
+    pytest-flake8==0.1 \
+    pytest-cover==3.0.0 \
+    slackclient==1.0.2
+
+COPY app/ /app/
+
+# Setup for manual library installation
+RUN mkdir /src/
+WORKDIR /src/
+
+
+# Install Halo Events library
+RUN git clone https://github.com/cloudpassage/halo-events
+RUN cd halo-events && \
+    git checkout ${HALO_EVENTS_VERSION} && \
+    pip install .
+
+
+# Install Halo Events library
+RUN git clone https://github.com/cloudpassage/halo-scans
+RUN cd halo-scans && \
+    git checkout ${HALO_SCANS_VERSION} && \
+    pip install .
+
+# Install Firewall Graph library
+RUN git clone https://github.com/cloudpassage-community/firewall-graph
+RUN cd firewall-graph && \
+    git checkout ${FIREWALL_GRAPH_VERSION} && \
+    pip install .
+
+RUN git clone https://github.com/ashmastaflash/halocelery
+RUN cd halocelery && \
+    git checkout ${HALO_CELERY_VERSION} && \
+    cd ../ && \
+    mv ./halocelery /app
+
+# Install Scan Graph library
+RUN git clone https://github.com/cloudpassage-community/scan-graph
+RUN cd scan-graph && \
+    git checkout ${SCAN_GRAPH_VERSION} && \
+    pip install .
+
+WORKDIR /app
+
+RUN pip install -r requirements.txt
+
+RUN py.test
+
+WORKDIR /app
+
+
+CMD ["python", "/app/runner.py"]
