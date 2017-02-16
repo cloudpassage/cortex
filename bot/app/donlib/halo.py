@@ -81,7 +81,7 @@ class Halo(object):
         elif query_type == "group_firewall_report":
             report = self.tasks.report_group_firewall.delay(target)
         elif query_type == "servers_in_group":
-            report = self.tasks.list_servers_in_group_formatted.delay(target)
+            report = self.tasks.servers_in_group_formatted.delay(target)
         elif query_type == "server_compliance_graph":
             report = self.tasks.report_server_scan_graph.delay(target)
         elif query_type == "tasks":
