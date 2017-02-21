@@ -138,6 +138,14 @@ class Halo(object):
             pass
         return report
 
+    def quarantine_server(self, event):
+        server_id = event["server_id"]
+        quarantine_group_name = event["quarantine_group"]
+        return self.tasks.quarantine_server(server_id, quarantine_group_name)
+
+    def add_ip_to_blocklist(self, ip_address, block_list_name):
+        return self.tasks.add_ip_to_list(ip_address, block_list_name)
+
     @classmethod
     def take_selfie(cls):
         selfie_file_name = "selfie.txt"

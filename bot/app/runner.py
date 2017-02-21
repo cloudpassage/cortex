@@ -3,10 +3,11 @@
 import base64
 import donlib
 import io
+import octolib
 import sys
 import threading
 import time
-import celery
+# import celery
 from halocelery import tasks
 from collections import deque
 
@@ -83,16 +84,27 @@ def die_if_unhealthy(slack_channel):
 
 def event_connector(config):
     global health_last_event_timestamp
+    halo = donlib.Halo(config, str(health_string), tasks)
     events = donlib.HaloEvents(config)
+    quarantine = octolib.Quarantine()
+    ipblock = octolib.IpBlockCheck()
     # We add a short delay in case of time drift between container and API
     time.sleep(10)
     while True:
         for event in events:
+            quarantine_check = quarantine.should_quarantine(event)
+            ip_block_check = ipblock.should_block_ip(event)
             health_last_event_timestamp = event["created_at"]
             if donlib.Utility.event_is_critical(event):
                 print("EVENT_CONNECTOR: Critical event detected!")
                 event_fmt = donlib.Formatter.format_item(event, "event")
                 slack_outbound.append((config.slack_channel, event_fmt))
+            if quarantine_check is not False:
+                async_jobs.append((config.slack_channel,
+                                   halo.quarantine_server(event)))
+            if ip_block_check is not False:
+                async_jobs.append((config.slack_channel,
+                                   halo.add_ip_to_blocklist))
 
 
 def daemon_speaker(config):
