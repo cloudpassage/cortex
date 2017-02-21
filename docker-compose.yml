@@ -108,7 +108,7 @@ services:
     networks:
       - octo_box
   web:
-    container-name: web
+    container_name: web
     build: ./web
     restart: always
     depends_on:
