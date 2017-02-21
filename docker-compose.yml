@@ -117,8 +117,21 @@ services:
       - /etc/letsencrypt:/etc/letsencrypt
     environment:
       PORTAL_DNS_NAME: ${PORTAL_DNS_NAME}
+    links:
+      - "appserver:5000"
     ports:
       - 443:443
+    networks:
+      - octo_box
+  appserver:
+    container_name: appserver
+    build: ./appserver
+    restart: always
+    depends_on:
+      - celeryworker
+    links:
+      - "rabbitmq:5672"
+      - "redis:6379"
     networks:
       - octo_box
 
