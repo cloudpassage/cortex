@@ -1,0 +1,15 @@
+quarantine:
+  enabled: true
+  trigger_group_names:
+    - q-test
+  quarantine_group_name: Quarantine
+  trigger_events:
+    - lids_rule_failed
+  trigger_only_on_critical: true
+
+ipblocker:
+  enabled: true
+  ip_zone_name: halo-ipblocker
+  trigger_events:
+    - lids_rule_failed
+  trigger_only_on_critical: true

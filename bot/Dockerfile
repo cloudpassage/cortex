@@ -34,7 +34,9 @@ RUN pip install \
     pytest-cover==3.0.0 \
     slackclient==1.0.2
 
+# Drop in the app code
 COPY app/ /app/
+COPY octo_conf.yml /
 
 # Setup for manual library installation
 RUN mkdir /src/
