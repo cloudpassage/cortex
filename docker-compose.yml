@@ -111,9 +111,10 @@ services:
     container-name: web
     build: ./web
     restart: always
-    depends_on: celeryworker
+    depends_on:
+      - celeryworker
     volumes:
-      - /opt/letsencrypt:/etc/letsencrypt
+      - /etc/letsencrypt:/etc/letsencrypt
     environment:
       PORTAL_DNS_NAME: ${PORTAL_DNS_NAME}
     ports:
