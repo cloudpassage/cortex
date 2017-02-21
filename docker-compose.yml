@@ -55,7 +55,7 @@ services:
   scheduler:
     container_name: scheduler
     image: docker.io/ashmastaflash/fiery-boat:latest
-    command: celery beat -A halocelery -l INFO 
+    command: celery beat -A halocelery -l INFO
     restart: always
     depends_on:
       - celeryworker
@@ -107,17 +107,17 @@ services:
       EVENTS_S3_BUCKET: ${EVENTS_S3_BUCKET}
     networks:
       - octo_box
-  watchtower:
-    container_name: watchtower
-    image: docker.io/centurylink/watchtower
-    command: --interval 30
-    depends_on:
-      - rabbitmq
-      - redis
-      - flower
-      - celeryworker
+  web:
+    container-name: web
+    build: ./web
+    restart: always
+    depends_on: celeryworker
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+      - /opt/letsencrypt:/etc/letsencrypt
+    environment:
+      PORTAL_DNS_NAME: ${PORTAL_DNS_NAME}
+    ports:
+      - 443:443
     networks:
       - octo_box
 
