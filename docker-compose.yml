@@ -134,6 +134,7 @@ services:
     links:
       - "rabbitmq:5672"
       - "redis:6379"
+      - "flower:5555"
     networks:
       - octo_box
 
