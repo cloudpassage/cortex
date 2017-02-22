@@ -9,4 +9,4 @@ def home_page():
 
 @app.route('/job-list')
 def reports_page():
-    return render_template('job-list.html', tasks=util.get_celery_tasks)
+    return render_template('job-list.html', tasks=util.get_celery_tasks())
