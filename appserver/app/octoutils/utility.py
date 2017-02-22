@@ -1,7 +1,7 @@
 import datetime
 import os
 import requests
-from urllib import urljoin
+from urlparse import urljoin
 
 class Utility(object):
     @classmethod

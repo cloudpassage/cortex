@@ -52,3 +52,7 @@
     * Don-Bot extended feature
     * Request policy by ID or name
     * Returns a formatted text document in channel
+
+
+### Instructions:
+docker run -it --rm -p 80:80 --name certbot  -v "/etc/letsencrypt:/etc/letsencrypt" -v "/var/lib/letsencrypt:/var/lib/letsencrypt" quay.io/letsencrypt/letsencrypt:latest certonly
