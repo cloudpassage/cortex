@@ -7,4 +7,4 @@ COPY app/ /app/
 
 ENV FLASK_APP=octoapp.py
 
-CMD ['flask', 'run', '--host=0.0.0.0']
+CMD flask run --host=0.0.0.0
