@@ -127,6 +127,8 @@ services:
     container_name: appserver
     build: ./appserver
     restart: always
+    environment:
+      FLOWER_HOST: http://flower:5555
     depends_on:
       - celeryworker
     links:
