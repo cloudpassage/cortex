@@ -144,12 +144,11 @@ class Halo(object):
         return self.tasks.quarantine_server(server_id, quarantine_group_name)
 
     def add_ip_to_blocklist(self, ip_address, block_list_name):
-        add_task = self.tasks.add_ip_to_list.delay(ip_address, block_list_name)
         # We trigger a removal job for one hour out.
         self.tasks.remove_ip_from_list.apply_async(args=[ip_address,
                                                          block_list_name],
                                                    countdown=3600)
-        return add_task
+        return self.tasks.add_ip_to_list.delay(ip_address, block_list_name)
 
     @classmethod
     def take_selfie(cls):
