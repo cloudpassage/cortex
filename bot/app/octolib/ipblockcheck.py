@@ -29,8 +29,11 @@ class IpBlockCheck(object):
         message = event["message"]
         for rx in rxen:
             m = re.search(rx, message)
-            if m.group("addy"):
-                return m.group("addy")
+            try:
+                if m.group("addy"):
+                    return m.group("addy")
+            except AttributeError:
+                pass
         return None
 
 
