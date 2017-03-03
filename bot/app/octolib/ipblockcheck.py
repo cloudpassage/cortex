@@ -34,7 +34,7 @@ class IpBlockCheck(object):
         return None
 
 
-    def set_ipblock_config(self):
+    def set_ipblockcheck_config(self):
         with open(IpBlockCheck.config_file, 'r') as config:
             ipblock_conf = yaml.load(config)["ipblocker"]
         self.ip_zone_name = ipblock_conf["ip_zone_name"]
