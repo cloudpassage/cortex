@@ -17,8 +17,14 @@ services:
     environment:
       CELERY_BACKEND_URL: redis://redis
       CELERY_BROKER_URL: amqp://guest:guest@rabbitmq:5672//
-    ports:
-      - "5555:5555"
+####################################
+#    Flower doesn't use SSL, so only enable this in a controlled
+#    troubleshooting environment.  OCTO-BOT can list tasks for you with
+#    "donbot tasks"
+#
+#    ports:
+#      - "5555:5555"
+####################################
     restart: always
     depends_on:
       - rabbitmq
@@ -109,22 +115,27 @@ services:
       EVENTS_S3_BUCKET: ${EVENTS_S3_BUCKET}
     networks:
       - octo_box
-  web:
-    container_name: web
-    build: ./web
-    restart: always
-    depends_on:
-      - celeryworker
-    volumes:
-      - /etc/letsencrypt:/etc/letsencrypt
-    environment:
-      PORTAL_DNS_NAME: ${PORTAL_DNS_NAME}
-    links:
-      - "appserver:5000"
-    ports:
-      - 443:443
-    networks:
-      - octo_box
+#####################################
+#  This is not ready yet, and currently only supports listing tasks.
+#  No authentication.  Only use in a controlled troubleshooting environment.
+#
+#  web:
+#    container_name: web
+#    build: ./web
+#    restart: always
+#    depends_on:
+#      - celeryworker
+#    volumes:
+#      - /etc/letsencrypt:/etc/letsencrypt
+#    environment:
+#      PORTAL_DNS_NAME: ${PORTAL_DNS_NAME}
+#    links:
+#      - "appserver:5000"
+#    ports:
+#      - 443:443
+#    networks:
+#      - octo_box
+###################################
   appserver:
     container_name: appserver
     build: ./appserver

@@ -112,6 +112,7 @@ class Halo(object):
                "\"group firewall `(group_id|group_name)`\"\n" +
                "\"compliance graph server `(server_id|server_name)`\"\n" +
                "\"version\"\n" +
+               "\"tasks\"\n" +
                "\"config\"\n")
         return ret
 

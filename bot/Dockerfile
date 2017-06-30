@@ -1,4 +1,4 @@
-FROM docker.io/halotools/don-bot:v0.16.0
+FROM docker.io/halotools/don-bot:v0.17.0
 MAINTAINER toolbox@cloudpassage.com
 
 ENV HALO_SDK_VERSION=1.0.1
