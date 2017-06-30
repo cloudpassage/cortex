@@ -12,13 +12,15 @@ ENV SLACK_ICON_URL=http://www.cloudpassage.com/wp-content/uploads/2016/12/don-op
 ENV HALO_API_HOSTNAME=api.cloudpassage.com
 ENV HALO_API_PORT=443
 
+# Up to root to add additional packages
+USER root
+
 RUN apk add -U --no-cache \
     gcc==5.3.0-r0 \
-    git=2.8.3-r0 \
     graphviz==2.38.0-r5 \
     graphviz-dev==2.38.0-r5 \
     linux-headers==4.4.6-r1 \
-    musl-dev==1.1.14-r14 \
+    musl-dev==1.1.14-r15 \
     python==2.7.12-r0 \
     python-dev==2.7.12-r0 \
     py-pip==8.1.2-r0
@@ -77,6 +79,11 @@ RUN cd scan-graph && \
 WORKDIR /app
 
 RUN pip install -r requirements.txt
+
+# Now take ownership and drop to non-root user
+RUN chown -R ${APP_USER}:$APP_GROUP /app
+
+USER ${APP_USER}
 
 RUN py.test
 
