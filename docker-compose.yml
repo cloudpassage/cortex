@@ -1,14 +1,13 @@
 version: '2'
 
-logging:
-  driver: journald
-
 services:
   rabbitmq:
     container_name: rabbitmq
     hostname: rabbitmq
     image: docker.io/rabbitmq:3-management
     restart: always
+    logging:
+      driver: journald
     depends_on:
       - redis
     networks:
@@ -30,6 +29,8 @@ services:
 ####################################
     restart: always
     read_only: true
+    logging:
+      driver: journald
     depends_on:
       - rabbitmq
     links:
@@ -51,6 +52,8 @@ services:
       HALO_API_SECRET_KEY_RW: ${HALO_API_SECRET_KEY_RW}
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+    logging:
+      driver: journald
     depends_on:
       - rabbitmq
     links:
@@ -62,6 +65,8 @@ services:
     container_name: redis
     image: docker.io/redis:3-alpine
     restart: always
+    logging:
+      driver: journald
     networks:
       - octo_box
   scheduler:
@@ -70,6 +75,8 @@ services:
     command: celery beat -A halocelery -l INFO
     restart: always
     read_only: true
+    logging:
+      driver: journald
     depends_on:
       - celeryworker
     links:
@@ -98,6 +105,8 @@ services:
     build: ./bot
     restart: always
     read_only: true
+    logging:
+      driver: journald
     depends_on:
       - celeryworker
     links:
@@ -154,6 +163,8 @@ services:
       HALO_API_KEY: ${HALO_API_KEY}
       HALO_API_SECRET_KEY: ${HALO_API_SECRET_KEY}
       FLASK_SECRET_KEY: ${FLASK_SECRET_KEY}
+    logging:
+      driver: journald
     depends_on:
       - celeryworker
     links:
