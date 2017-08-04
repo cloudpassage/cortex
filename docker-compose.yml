@@ -26,6 +26,7 @@ services:
 #      - "5555:5555"
 ####################################
     restart: always
+    read-only: true
     depends_on:
       - rabbitmq
     links:
@@ -65,6 +66,7 @@ services:
     image: docker.io/ashmastaflash/fiery-boat:develop
     command: celery beat -A halocelery -l INFO
     restart: always
+    read-only: true
     depends_on:
       - celeryworker
     links:
@@ -92,6 +94,7 @@ services:
     container_name: octo-bot
     build: ./bot
     restart: always
+    read-only: true
     depends_on:
       - celeryworker
     links:
@@ -140,6 +143,7 @@ services:
     container_name: appserver
     build: ./appserver
     restart: always
+    read-only: true
     environment:
       FLOWER_HOST: http://flower:5555
       CELERY_BACKEND_URL: redis://redis
