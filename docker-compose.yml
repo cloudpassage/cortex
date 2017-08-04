@@ -74,7 +74,6 @@ services:
     image: docker.io/ashmastaflash/fiery-boat:v0.1
     command: celery beat -A halocelery -l INFO
     restart: always
-    read_only: true
     logging:
       driver: journald
     depends_on:
