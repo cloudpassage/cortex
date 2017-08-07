@@ -121,6 +121,8 @@ class Halo(object):
         return "v%s" % product_version
 
     def running_config(self):
+        if os.getenv("NOSLACK"):
+            return "Slack integration is disabled.  CLI access only."
         if self.monitor_events == 'yes':
             events = "Monitoring Halo events"
         else:
