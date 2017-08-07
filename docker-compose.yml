@@ -113,6 +113,7 @@ services:
       - "redis:6379"
       - "flower:5555"
     environment:
+      # NOSLACK: true
       CELERY_BACKEND_URL: redis://redis
       CELERY_BROKER_URL: amqp://guest:guest@rabbitmq:5672//
       FLOWER_HOST: http://flower:5555

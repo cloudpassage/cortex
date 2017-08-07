@@ -4,6 +4,7 @@ import base64
 import donlib
 import io
 import octolib
+import os
 import sys
 import threading
 import time
@@ -190,19 +191,31 @@ def slack_out_manager(config):
 
 
 def check_configs(config):
-    if config.sane() is False:
-        print("Configuration is bad!  Exiting!")
-        sys.exit(1)
-
     halo = donlib.Halo(config, "", "")
     if halo.credentials_work() is False:
         print("Halo credentials are bad!  Exiting!")
+        sys.exit(1)
+
+    # If NOSLACK env var is set, don't go any further!
+    if os.getenv("NOSLACK"):
+        noslack_hold()
+
+    if config.sane() is False:
+        print("Configuration is bad!  Exiting!")
         sys.exit(1)
 
     slack = donlib.Slack(config)
     if slack.credentials_work() is False:
         print("Slack credentials are bad!  Exiting!")
         sys.exit(1)
+
+def noslack_hold():
+    msg = ("Slack integration is disabled.  "
+           "Interact with Halo using:"
+           " 'docker exec -it octo-bot python /app/interrogate.py'")
+    while True:
+        print(msg)
+        time.sleep(3600)
 
 if __name__ == "__main__":
     main()

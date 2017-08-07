@@ -2,7 +2,7 @@
 
 ## OCTO prototype platform
 
-### Features:
+### Features
 
 * Don-Bot (extended version)
   * halo-oriented interactions:
@@ -38,7 +38,7 @@
 * Scans to S3 (daily job)
 * Events to S3 (daily job)
 
-### Potential expansion:
+### Potential expansion
 
 * Candidate features:
   * Events to ticket
@@ -53,6 +53,45 @@
     * Request policy by ID or name
     * Returns a formatted text document in channel
 
+### Requirements
 
-### Instructions:
+* docker-compose (https://docs.docker.com/compose/install/)
+
+### Use
+
+* Clone this repository
+* Navigate to the root directory of this repository
+* Set these environment variables:
+
+| Variable               | Purpose                                             |
+|------------------------|-----------------------------------------------------|
+| AWS_ACCESS_KEY_ID      | API key ID from Amazon AWS                          |
+| AWS_SECRET_ACCESS_KEY  | Secret key corresponding to AWS_ACCESS_KEY_ID       |
+| SCANS_S3_BUCKET        | Name of S3 bucket for scan archive                  |
+| EVENTS_S3_BUCKET       | Name of S3 bucket for events archive                |
+| HALO_API_KEY           | Read-only API key for Halo                          |
+| HALO_API_SECRET_KEY    | Secret corresponding to HALO_API_KEY                |
+| HALO_API_KEY_RW        | Read-Write API key for Halo                         |
+| HALO_API_SECRET_KEY_RW | Secret corresponding to HALO_API_KEY_RW             |
+| SLACK_API_TOKEN        | API token for Slack                                 |
+| SLACK_CHANNEL          | Channel Octobot should join and listen.  Octobot will not interact with anyone who is not a member of this channel. |
+| PORTAL_DNS_NAME        | Only set if you enable the web server.  (see Letsencrypt, below.)                           |
+| FLASK_SECRET_KEY       | Only set if you enable the web server.              |
+
+### Letsencrypt (if you enable the web server):
+
 docker run -it --rm -p 80:80 --name certbot  -v "/etc/letsencrypt:/etc/letsencrypt" -v "/var/lib/letsencrypt:/var/lib/letsencrypt" quay.io/letsencrypt/letsencrypt:latest certonly
+
+### Using without Slack
+
+If you prefer not to use Slack, un-comment the line in docker-compose.yml that
+contains `NOSLACK: true`.  This will cause octo-bot to stop and loop before
+attempting to connect to Slack.  To interact with Halo from the command line,
+SSH into the host running docker-compose and run this:
+`sudo docker exec -it octo-bot python /app/interrogate.py`.  You will then
+be dropped into a shell where you can interact with octo-box.  Type `help` and
+press enter for details on available comands.  Output that is typically
+returned in image form will come back as base64-encoded text.  You can
+copy/paste from the terminal window into a text editor, then run it through
+the decoding process (`cat FILE_WITH_BASE64_DATA | base64 -D > output.png`)
+to get the original image.
