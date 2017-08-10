@@ -76,6 +76,9 @@
 | SLACK_API_TOKEN        | API token for Slack                                 |
 | SLACK_CHANNEL          | Channel Octobot should join and listen.  Octobot will not interact with anyone who is not a member of this channel. |
 
+* Confirm that the configuration for ip blocker and quarantine in
+`octo-box/bot/octo_conf.yml` matches your environment, especially regarding
+group names, ip list names, and event types.
 
 * As a user who has sufficient access to run Docker containers:
 `docker-compose up -d --build`
