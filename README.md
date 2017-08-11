@@ -38,20 +38,6 @@
 * Scans to S3 (daily job)
 * Events to S3 (daily job)
 
-### Potential expansion
-
-* Candidate features:
-  * Events to ticket
-    * Filters like Quarantine
-    * On match, create issue in Jira, ServiceNow, Remedy
-  * Scan server XXX
-    * Don-Bot extended feature
-    * Similar syntax to "describe server", above
-    * Trigger scans for all modules, report results (formatted text) in channel
-  * Describe policy
-    * Don-Bot extended feature
-    * Request policy by ID or name
-    * Returns a formatted text document in channel
 
 ### Requirements
 
