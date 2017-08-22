@@ -150,29 +150,28 @@ services:
 #      - 443:443
 #    networks:
 #      - octo_box
-###################################
-  appserver:
-    container_name: appserver
-    build: ./appserver
-    restart: always
-    read_only: true
-    environment:
-      FLOWER_HOST: http://flower:5555
-      CELERY_BACKEND_URL: redis://redis
-      CELERY_BROKER_URL: amqp://guest:guest@rabbitmq:5672//
-      HALO_API_KEY: ${HALO_API_KEY}
-      HALO_API_SECRET_KEY: ${HALO_API_SECRET_KEY}
-      FLASK_SECRET_KEY: ${FLASK_SECRET_KEY}
-    logging:
-      driver: journald
-    depends_on:
-      - celeryworker
-    links:
-      - "rabbitmq:5672"
-      - "redis:6379"
-      - "flower:5555"
-    networks:
-      - octo_box
+#  appserver:
+#    container_name: appserver
+#    build: ./appserver
+#    restart: always
+#    read_only: true
+#    environment:
+#      FLOWER_HOST: http://flower:5555
+#      CELERY_BACKEND_URL: redis://redis
+#      CELERY_BROKER_URL: amqp://guest:guest@rabbitmq:5672//
+#      HALO_API_KEY: ${HALO_API_KEY}
+#      HALO_API_SECRET_KEY: ${HALO_API_SECRET_KEY}
+#      FLASK_SECRET_KEY: ${FLASK_SECRET_KEY}
+#    logging:
+#      driver: journald
+#    depends_on:
+#      - celeryworker
+#    links:
+#      - "rabbitmq:5672"
+#      - "redis:6379"
+#      - "flower:5555"
+#    networks:
+#      - octo_box
 
 networks:
   octo_box:
