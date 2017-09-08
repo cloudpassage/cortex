@@ -22,13 +22,13 @@
     * Bot health (thread health, etc...)
     * Bot running configuration (enabled features)
     * Bot command reference (`donbot help`)
-* Quarantine (incomplete)
+* Quarantine 
   * Configuration in bot/octo-conf.yml
   * Quarantine criteria:
     * Server group
     * Event type
     * Event criticality
-* IP-Blocker (incomplete)
+* IP-Blocker 
   * Configuration in bot/octo-conf.yml
     * IP zone name
     * Event type
