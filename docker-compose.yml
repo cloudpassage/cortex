@@ -53,6 +53,8 @@ services:
       HALO_API_SECRET_KEY_RW: ${HALO_API_SECRET_KEY_RW}
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_ROLE_NAME: ${AWS_ROLE_NAME}
+      AWS_ACCOUNT_NUMBERS: ${AWS_ACCOUNT_NUMBERS}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
 #    logging:
@@ -86,10 +88,10 @@ services:
       - "redis:6379"
       - "flower:5555"
     environment:
-      EVENT_EXPORT_HOUR: 23
-      EVENT_EXPORT_MIN: 01
-      SCAN_EXPORT_HOUR: 23
-      SCAN_EXPORT_MIN: 01
+      EVENT_EXPORT_HOUR: 19
+      EVENT_EXPORT_MIN: 21
+      SCAN_EXPORT_HOUR: 19
+      SCAN_EXPORT_MIN: 21
       CELERY_BACKEND_URL: redis://redis
       CELERY_BROKER_URL: amqp://guest:guest@rabbitmq:5672//
       FLOWER_HOST: http://flower:5555

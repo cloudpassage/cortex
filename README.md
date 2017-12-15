@@ -16,19 +16,21 @@
       * server issues
       * server events
     * group firewall policy graph renderer
-    * server compliance graph report renderer
+    * Halo-EC2 footprint delta reporter
+      * Produce a CSV with all EC2 workloads in an account which are not protected by Halo.
+      * Support STS-based cross-account access.  Inventory multiple AWS accounts.
   * Don-Bot internal:
     * Job queue status
     * Bot health (thread health, etc...)
     * Bot running configuration (enabled features)
     * Bot command reference (`donbot help`)
-* Quarantine 
+* Quarantine
   * Configuration in bot/octo-conf.yml
   * Quarantine criteria:
     * Server group
     * Event type
     * Event criticality
-* IP-Blocker 
+* IP-Blocker
   * Configuration in bot/octo-conf.yml
     * IP zone name
     * Event type
@@ -36,7 +38,9 @@
 * Critical Events Monitor
   * Send critical events to Slack channel
 * Scans to S3 (daily job)
+  * Send all scans for prior day to S3
 * Events to S3 (daily job)
+  * Send all events from prior day to S3
 
 
 ### Requirements
@@ -53,6 +57,8 @@
 |------------------------|-----------------------------------------------------|
 | AWS_ACCESS_KEY_ID      | API key ID from Amazon AWS                          |
 | AWS_SECRET_ACCESS_KEY  | Secret key corresponding to AWS_ACCESS_KEY_ID       |
+| AWS_ROLE_NAME          | (Optional) Role to assume via STS, for cross-account inventory.|
+| AWS_ACCOUNT_NUMBERS    | (Optional) Semicolon-delimited list of account numbers having `AWS_ROLE_NAME` |
 | SCANS_S3_BUCKET        | Name of S3 bucket for scan archive                  |
 | EVENTS_S3_BUCKET       | Name of S3 bucket for events archive                |
 | HALO_API_KEY           | Read-only API key for Halo                          |
@@ -61,6 +67,9 @@
 | HALO_API_SECRET_KEY_RW | Secret corresponding to HALO_API_KEY_RW             |
 | SLACK_API_TOKEN        | API token for Slack                                 |
 | SLACK_CHANNEL          | Channel Octobot should join and listen.  Octobot will not interact with anyone who is not a member of this channel. |
+
+* For more information on `AWS_ROLE_NAME` and `AWS_ACCOUNT_NUMBERS` settings, refer to
+https://github.com/ashmastaflash/ec2-halo-delta
 
 * Confirm that the configuration for ip blocker and quarantine in
 `octo-box/bot/octo_conf.yml` matches your environment, especially regarding

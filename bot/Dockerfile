@@ -2,7 +2,7 @@ FROM docker.io/halotools/don-bot:v0.17.0
 MAINTAINER toolbox@cloudpassage.com
 
 ENV HALO_SDK_VERSION=1.0.1
-ENV HALO_CELERY_VERSION=v0.4
+ENV HALO_CELERY_VERSION=v0.4.1
 ENV FIREWALL_GRAPH_VERSION=v0.1
 
 ENV SLACK_ICON_URL=http://www.cloudpassage.com/wp-content/uploads/2016/12/don-operator.png
