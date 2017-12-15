@@ -2,11 +2,8 @@ FROM docker.io/halotools/don-bot:v0.17.0
 MAINTAINER toolbox@cloudpassage.com
 
 ENV HALO_SDK_VERSION=1.0.1
-ENV HALO_EVENTS_VERSION=v0.10.4
-ENV HALO_SCANS_VERSION=v0.11
-ENV HALO_CELERY_VERSION=v0.3.4
+ENV HALO_CELERY_VERSION=v0.4
 ENV FIREWALL_GRAPH_VERSION=v0.1
-ENV SCAN_GRAPH_VERSION=v0.1.1
 
 ENV SLACK_ICON_URL=http://www.cloudpassage.com/wp-content/uploads/2016/12/don-operator.png
 ENV HALO_API_HOSTNAME=api.cloudpassage.com
@@ -48,19 +45,6 @@ RUN mkdir /src/
 WORKDIR /src/
 
 
-# Install Halo Events library
-RUN git clone https://github.com/cloudpassage/halo-events
-RUN cd halo-events && \
-    git checkout ${HALO_EVENTS_VERSION} && \
-    pip install .
-
-
-# Install Halo Events library
-RUN git clone https://github.com/cloudpassage/halo-scans
-RUN cd halo-scans && \
-    git checkout ${HALO_SCANS_VERSION} && \
-    pip install .
-
 # Install Firewall Graph library
 RUN git clone https://github.com/cloudpassage-community/firewall-graph
 RUN cd firewall-graph && \
@@ -73,11 +57,6 @@ RUN cd halocelery && \
     cd ../ && \
     mv ./halocelery /app
 
-# Install Scan Graph library
-RUN git clone https://github.com/cloudpassage-community/scan-graph
-RUN cd scan-graph && \
-    git checkout ${SCAN_GRAPH_VERSION} && \
-    pip install .
 
 WORKDIR /app
 

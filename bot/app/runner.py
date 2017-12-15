@@ -200,6 +200,7 @@ def check_configs(config):
         print("Slack credentials are bad!  Exiting!")
         sys.exit(1)
 
+
 def noslack_hold():
     msg = ("Slack integration is disabled.  "
            "Interact with Halo using:"
@@ -207,6 +208,7 @@ def noslack_hold():
     while True:
         print(msg)
         time.sleep(3600)
+
 
 if __name__ == "__main__":
     main()
