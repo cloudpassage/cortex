@@ -16,7 +16,8 @@ class Lexicals(object):
     @classmethod
     def get_message_type(cls, message):
         retval = ("unknown")
-        matchers = [(r'\scompliance\s+graph\s+server\s+', "server_compliance_graph"),  # NOQA
+        matchers = [(r'\s+ec2\s+halo\s+footprint\s+csv\s*', "ec2_halo_footprint_csv"),  # NOQA
+                    (r'\s+halo\s+ec2\s+footprint\s+csv\s*', "ec2_halo_footprint_csv"),  # NOQA
                     (r'\sserver\s+(?!group)(?!\")\S+', "server_report"),
                     (r'\sserver\s+(?!group)\"[^\"]+\"', "server_report"),
                     (r'\s+ip\s+\S+', "ip_report"),

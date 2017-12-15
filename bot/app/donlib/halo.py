@@ -82,8 +82,8 @@ class Halo(object):
             report = self.tasks.report_group_firewall.delay(target)
         elif query_type == "servers_in_group":
             report = self.tasks.servers_in_group_formatted.delay(target)
-        elif query_type == "server_compliance_graph":
-            report = self.tasks.report_server_scan_graph.delay(target)
+        elif query_type == "ec2_halo_footprint_csv":
+            report = self.tasks.report_ec2_halo_footprint_csv.delay()
         elif query_type == "tasks":
             report = self.list_tasks_formatted()
         elif query_type == "selfie":
@@ -110,7 +110,7 @@ class Halo(object):
                "\"list server groups\"\n" +
                "\"servers in group `(group_id|group_name)`\"\n" +
                "\"group firewall `(group_id|group_name)`\"\n" +
-               "\"compliance graph server `(server_id|server_name)`\"\n" +
+               "\"ec2 halo footprint csv\"\n" +
                "\"version\"\n" +
                "\"tasks\"\n" +
                "\"config\"\n")

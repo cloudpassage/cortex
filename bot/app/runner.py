@@ -116,7 +116,6 @@ def daemon_speaker(config):
         celery_tasks = tasks
         halo = donlib.Halo(config, str(health_string), celery_tasks)
         try:
-            # print("Type for message %s is %s" % (str(message), type(message)))
             message = slack_inbound.popleft()
             channel = message["channel"]
             halo_query, target = donlib.Lexicals.parse(message)
@@ -136,28 +135,21 @@ def async_manager(config):
     while True:
         try:
             job = async_jobs.popleft()
-            # print "ASYNC_MGR: Processing async job %s" % str(job[1])
             if job[1].ready():
                 if job[1].successful():
                     outbound_construct = (job[0], job[1].result)
                     slack_outbound.append(outbound_construct)
-                    # print "ASYNC_MGR: Job was successful"
                     job[1].forget()
                 elif job[1].failed():
                     outbound_construct = (job[0], "REQUEST FAILED")
                     slack_outbound.append(outbound_construct)
                     job[1].forget()
-                    # print "ASYNC_MGR: Job was not successful."
                 else:  # If not successful and not failed, throw it back.
                     async_jobs.append(job)
-                    # print "ASYNC_MGR: Job is neither successful or failed!"
-                    # print "ASYNC_MGR: Status: %s" % job[0].state
             else:
-                # print "ASYNC_MGR: Job is not ready yet."
                 async_jobs.append(job)
                 time.sleep(1)
         except IndexError:
-            # print "ASYNC_MGR: No jobs in async queue"
             time.sleep(1)
 
 
@@ -176,16 +168,15 @@ def slack_out_manager(config):
             try:
                 # Attempt to decode from Base64.
                 if "\n" in message[1]:
-                    raise TypeError
+                    raise TypeError("Detected plaintext response...")
                 dec_msg = base64.decodestring(message[1])
-                slack.send_file(message[0], io.BytesIO(dec_msg),
+                print("Detected Base64-encoded file...")
+                slack.send_file(message[0], io.BytesIO(dec_msg).read(),
                                 "Daemonic File")
-            except TypeError:
-                if len(message[1]) > 4000:
-                    slack.send_report(message[0], message[1],
-                                      "Daemonic Report")
-                else:
-                    slack.send_message(message[0], message[1])
+            except TypeError as e:
+                print(e)
+                slack.send_report(message[0], message[1],
+                                  "Daemonic Report")
         except IndexError:
             time.sleep(1)
 

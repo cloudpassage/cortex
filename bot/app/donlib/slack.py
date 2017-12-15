@@ -1,6 +1,7 @@
 # coding: utf-8
+import magic
+import mimetypes
 import time
-
 from slackclient import SlackClient
 from socket import error as SocketError
 
@@ -68,11 +69,14 @@ class Slack(object):
 
     def send_file(self, channel, report, comment):
         """Slack looks at the file header to determine type"""
+        file_ext = self.get_file_extension_for_content(report)
+        filename = "OCTOBOX_Content%s" % file_ext
+        print("Uploading %s" % filename)
         self.client.api_call("files.upload",
                              initial_comment=comment,
                              channels=channel,
                              file=report,
-                             filename="anybodys_guess.png",
+                             filename=filename,
                              username=self.botname,
                              icon_url=self.bot_avatar)
 
@@ -179,3 +183,29 @@ class Slack(object):
         elif myname in message['text'].lower().split():
             is_for_me = True
         return is_for_me
+
+    @classmethod
+    def get_file_extension_for_content(cls, content):
+        suspect_file_extensions = [".ksh"]
+        mime_type = magic.from_buffer(content, mime=True)
+        file_ext = mimetypes.guess_extension(mime_type)
+        if file_ext in suspect_file_extensions and cls.is_a_csv(content):
+            file_ext = ".csv"
+        return file_ext
+
+    @classmethod
+    def is_a_csv(cls, content):
+        well_is_it = True
+        lines = content.splitlines()
+        if len(lines) == 1:
+            well_is_it = False
+        else:
+            # If every line, split by commas, has the same number of parts,
+            # we will call it a CSV.
+            field_count = len(lines[0].split(','))
+            for line in lines:
+                if len(line.split(',')) == field_count:
+                    pass
+                else:
+                    well_is_it = False
+        return well_is_it

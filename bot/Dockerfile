@@ -4,7 +4,7 @@ MAINTAINER toolbox@cloudpassage.com
 ENV HALO_SDK_VERSION=1.0.1
 ENV HALO_EVENTS_VERSION=v0.10.4
 ENV HALO_SCANS_VERSION=v0.11
-ENV HALO_CELERY_VERSION=master
+ENV HALO_CELERY_VERSION=v0.3.4
 ENV FIREWALL_GRAPH_VERSION=v0.1
 ENV SCAN_GRAPH_VERSION=v0.1.1
 
@@ -19,8 +19,9 @@ RUN apk add -U --no-cache \
     gcc==5.3.0-r0 \
     graphviz==2.38.0-r5 \
     graphviz-dev==2.38.0-r5 \
+    libmagic==5.27-r0 \
     linux-headers==4.4.6-r1 \
-    musl-dev==1.1.14-r15 \
+    musl-dev==1.1.14-r16 \
     python==2.7.12-r0 \
     python-dev==2.7.12-r0 \
     py-pip==8.1.2-r0
@@ -30,10 +31,12 @@ RUN pip install \
     boto3==1.4.3 \
     celery[redis]==4.0.2 \
     cloudpassage==${HALO_SDK_VERSION} \
+    docker==2.6.1 \
     flower==0.9.1 \
     pytest==2.8.0 \
     pytest-flake8==0.1 \
     pytest-cover==3.0.0 \
+    python-magic==0.4.15 \
     slackclient==1.0.2
 
 # Drop in the app code

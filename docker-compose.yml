@@ -6,15 +6,15 @@ services:
     hostname: rabbitmq
     image: docker.io/rabbitmq:3-management
     restart: always
-    logging:
-      driver: journald
+#    logging:
+#      driver: journald
     depends_on:
       - redis
     networks:
       - octo_box
   flower:
     container_name: fiery_boat
-    image: docker.io/ashmastaflash/fiery-boat:v0.1
+    image: docker.io/ashmastaflash/fiery-boat:develop
     command: celery flower -A halocelery --address=0.0.0.0 --port=5555 -l INFO
     environment:
       CELERY_BACKEND_URL: redis://redis
@@ -29,8 +29,8 @@ services:
 ####################################
     restart: always
     read_only: true
-    logging:
-      driver: journald
+#    logging:
+#      driver: journald
     depends_on:
       - rabbitmq
     links:
@@ -40,8 +40,9 @@ services:
       - octo_box
   celeryworker:
     container_name: celeryworker
-    image: docker.io/ashmastaflash/fiery-boat:v0.1
+    image: docker.io/ashmastaflash/fiery-boat:develop
     command: celery worker -A halocelery -l INFO
+    user: root
     restart: always
     environment:
       CELERY_BACKEND_URL: redis://redis
@@ -52,8 +53,10 @@ services:
       HALO_API_SECRET_KEY_RW: ${HALO_API_SECRET_KEY_RW}
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
-    logging:
-      driver: journald
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+#    logging:
+#      driver: journald
     depends_on:
       - rabbitmq
     links:
@@ -65,17 +68,17 @@ services:
     container_name: redis
     image: docker.io/redis:3-alpine
     restart: always
-    logging:
-      driver: journald
+#    logging:
+#      driver: journald
     networks:
       - octo_box
   scheduler:
     container_name: scheduler
-    image: docker.io/ashmastaflash/fiery-boat:v0.1
+    image: docker.io/ashmastaflash/fiery-boat:develop
     command: celery beat -A halocelery -l INFO
     restart: always
-    logging:
-      driver: journald
+#    logging:
+#      driver: journald
     depends_on:
       - celeryworker
     links:
@@ -104,8 +107,8 @@ services:
     build: ./bot
     restart: always
     read_only: true
-    logging:
-      driver: journald
+#    logging:
+#      driver: journald
     depends_on:
       - celeryworker
     links:

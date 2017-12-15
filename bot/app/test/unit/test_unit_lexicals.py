@@ -131,3 +131,8 @@ class TestUnitLexicals:
         message = 'donbot group firewall xyz'
         expected = "xyz"
         assert donlib.Lexicals.get_target(message) == expected
+
+    def test_unit_lexical_ec2_halo_footprint_csv(self):
+        message = 'donbot ec2 halo footprint csv'
+        expected = "ec2_halo_footprint_csv"
+        assert donlib.Lexicals.get_message_type(message) == expected
