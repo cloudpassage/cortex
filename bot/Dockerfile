@@ -1,9 +1,29 @@
-FROM docker.io/halotools/don-bot:v0.17.0
+# Get the halocelery component
+FROM docker.io/halotools/python-sdk:ubuntu-16.04_sdk-1.0.6 as downloader
 MAINTAINER toolbox@cloudpassage.com
 
-ENV HALO_SDK_VERSION=1.0.1
+ARG HALOCELERY_BRANCH=v0.4.4
+
+RUN apt-get update && \
+    apt-get install -y \
+        git
+
+WORKDIR /app/
+
+RUN echo "Target branch for this build: $HALOCELERY_BRANCH"
+
+RUN git clone https://github.com/ashmastaflash/halocelery
+
+RUN cd halocelery && \
+    git archive --verbose --format=tar.gz -o /app/halocelery.tar.gz $HALOCELERY_BRANCH
+
+
+#####################################
+
+FROM docker.io/halotools/python-sdk:ubuntu-16.04_sdk-1.0.6
+MAINTAINER toolbox@cloudpassage.com
+
 ENV HALO_CELERY_VERSION=v0.4.1
-ENV FIREWALL_GRAPH_VERSION=v0.1
 
 ENV SLACK_ICON_URL=http://www.cloudpassage.com/wp-content/uploads/2016/12/don-operator.png
 ENV HALO_API_HOSTNAME=api.cloudpassage.com
@@ -12,22 +32,9 @@ ENV HALO_API_PORT=443
 # Up to root to add additional packages
 USER root
 
-RUN apk add -U --no-cache \
-    gcc==5.3.0-r0 \
-    graphviz==2.38.0-r5 \
-    graphviz-dev==2.38.0-r5 \
-    libmagic==5.27-r0 \
-    linux-headers==4.4.6-r1 \
-    musl-dev==1.1.14-r16 \
-    python==2.7.12-r0 \
-    python-dev==2.7.12-r0 \
-    py-pip==8.1.2-r0
-
-
 RUN pip install \
     boto3==1.4.3 \
     celery[redis]==4.0.2 \
-    cloudpassage==${HALO_SDK_VERSION} \
     docker==2.6.1 \
     flower==0.9.1 \
     pytest==2.8.0 \
@@ -45,16 +52,11 @@ RUN mkdir /src/
 WORKDIR /src/
 
 
-# Install Firewall Graph library
-RUN git clone https://github.com/cloudpassage-community/firewall-graph
-RUN cd firewall-graph && \
-    git checkout ${FIREWALL_GRAPH_VERSION} && \
-    pip install .
+COPY --from=downloader /app/halocelery.tar.gz /src/halocelery/halocelery.tar.gz
 
-RUN git clone https://github.com/ashmastaflash/halocelery
 RUN cd halocelery && \
-    git checkout ${HALO_CELERY_VERSION} && \
-    cd ../ && \
+    tar -zxvf ./halocelery.tar.gz && \
+    cd /src/ && \
     mv ./halocelery /app
 
 
