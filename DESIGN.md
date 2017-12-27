@@ -6,7 +6,7 @@ Octobox is a collection of Docker containers managed by docker-compose.  All lon
 
 ### octobot
 
-Users can interact with Octobox via SSH or Slack integration. Both of these communication paths exist via the `octobot` component.  The `bot` component is a long-running container within the Octobox application.  Most of the `octobot` component's human interaction functionality is delivered by queueing jobs for the `celeryworker` component, via the `rabbitmq` component.  The task definitions used in the `celeryworker` component are included in the `octobot` component at container image build time.  See bot/Dockerfile for more information.
+Users can interact with Octobox via SSH or Slack integration. Both of these communication paths exist via the `octobot` component.  The `octobot` component is a long-running container within the Octobox application.  Most of the `octobot` component's human interaction functionality is delivered by queueing jobs for the `celeryworker` component, via the `rabbitmq` component.  The task definitions used in the `celeryworker` component are included in the `octobot` component at container image build time.  See bot/Dockerfile for more information.
 
 Example interaction lifecycle:
 
