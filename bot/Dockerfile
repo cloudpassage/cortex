@@ -23,8 +23,6 @@ RUN cd halocelery && \
 FROM docker.io/halotools/python-sdk:ubuntu-16.04_sdk-1.0.6
 MAINTAINER toolbox@cloudpassage.com
 
-ENV HALO_CELERY_VERSION=v0.4.1
-
 ENV SLACK_ICON_URL=http://www.cloudpassage.com/wp-content/uploads/2016/12/don-operator.png
 ENV HALO_API_HOSTNAME=api.cloudpassage.com
 ENV HALO_API_PORT=443
