@@ -2,6 +2,17 @@
 
 ## OCTO prototype platform
 
+This integration package is designed to get you up and running with Halo
+_really_ fast.  It's also been designed with the idea that you want to build
+your own environment-specific integrations, and thusly won't be using OCTOBOX
+forever.  Many components in OCTOBOX can be implemented independently, using
+your favorite CI (or other automation) tools.  So use OCTOBOX when you start
+out with Halo, and as you build your own environment-specific automation, you
+can peel off and re-implement specific components (the Halo-EC2 footprint delta
+reporter and scan/event exporters, for instance) in a way that makes the most
+sense for your environment, using your favorite automation tools.
+
+
 ### Features
 
 * Don-Bot (extended version)
@@ -91,3 +102,10 @@ returned in image form will come back as base64-encoded text.  You can
 copy/paste from the terminal window into a text editor, then run it through
 the decoding process (`cat FILE_WITH_BASE64_DATA | base64 -D > output.png`)
 to get the original image.
+
+### Docker host configuration recommendations
+
+The use of journald for logging in Docker is strongly encouraged. The containers
+in this application produce verbose logs, and it is best to send them to
+journald instead of the default Docker logging mechanism. Instructions for
+configuring Docker's logging driver can be found [here](https://docs.docker.com/engine/admin/logging/journald/#usage).
