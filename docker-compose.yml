@@ -11,8 +11,8 @@ services:
     networks:
       - octo_box
   flower:
-    container_name: fiery_boat
-    image: docker.io/ashmastaflash/fiery-boat:v0.4.6
+    container_name: flower
+    image: docker.io/halotools/halocelery:v0.4.7
     command: celery flower -A halocelery --address=0.0.0.0 --port=5555 -l INFO
     environment:
       CELERY_BACKEND_URL: redis://redis
@@ -36,7 +36,7 @@ services:
       - octo_box
   celeryworker:
     container_name: celeryworker
-    image: docker.io/ashmastaflash/fiery-boat:v0.4.6
+    image: docker.io/halotools/halocelery:v0.4.7
     command: celery worker -A halocelery -l INFO
     user: root
     restart: always
@@ -78,7 +78,7 @@ services:
       - octo_box
   scheduler:
     container_name: scheduler
-    image: docker.io/ashmastaflash/fiery-boat:v0.4.6
+    image: docker.io/halotools/fiery-halocelery:v0.4.7
     command: celery beat -A halocelery -l INFO
     restart: always
     depends_on:
