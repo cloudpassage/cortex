@@ -78,7 +78,7 @@ services:
       - octo_box
   scheduler:
     container_name: scheduler
-    image: docker.io/halotools/fiery-halocelery:v0.4.7
+    image: docker.io/halotools/halocelery:v0.4.7
     command: celery beat -A halocelery -l INFO
     restart: always
     depends_on:
