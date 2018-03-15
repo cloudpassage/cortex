@@ -106,7 +106,7 @@ services:
       - octo_box
   octobot:
     container_name: octo-bot
-    build: ./bot
+    image: docker.io/halotools/don-bot:latest
     restart: always
     read_only: true
     depends_on:
