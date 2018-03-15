@@ -1,9 +1,0 @@
-pytest==3.1.1
-flake8==2.6.2
-pyflakes==1.2.3
-pycodestyle==2.0.0
-mccabe==0.5.3
-pytest-flake8==0.1
-pytest-cov==2.5.1
-codeclimate-test-reporter==0.2.0
-slackclient==1.0.2
