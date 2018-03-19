@@ -1,12 +1,12 @@
-# OCTOBOX
+# CORTEX
 
-## OCTO prototype platform
+## CORTEX prototype platform
 
 This integration package is designed to get you up and running with Halo
 _really_ fast.  It's also been designed with the idea that you want to build
-your own environment-specific integrations, and thusly won't be using OCTOBOX
-forever.  Many components in OCTOBOX can be implemented independently, using
-your favorite CI (or other automation) tools.  So use OCTOBOX when you start
+your own environment-specific integrations, and thusly won't be using CORTEX
+forever.  Many components in CORTEX can be implemented independently, using
+your favorite CI (or other automation) tools.  So use CORTEX when you start
 out with Halo, and as you build your own environment-specific automation, you
 can peel off and re-implement specific components (the Halo-EC2 footprint delta
 reporter and scan/event exporters, for instance) in a way that makes the most
@@ -36,13 +36,13 @@ sense for your environment, using your favorite automation tools.
     * Bot running configuration (enabled features)
     * Bot command reference (`donbot help`)
 * Quarantine
-  * Configuration in bot/octo-conf.yml
+  * Configuration in bot/cortex-conf.yml
   * Quarantine criteria:
     * Server group
     * Event type
     * Event criticality
 * IP-Blocker
-  * Configuration in bot/octo-conf.yml
+  * Configuration in bot/cortex-conf.yml
     * IP zone name
     * Event type
     * Event criticality
@@ -77,13 +77,13 @@ sense for your environment, using your favorite automation tools.
 | HALO_API_KEY_RW        | Read-Write API key for Halo                         |
 | HALO_API_SECRET_KEY_RW | Secret corresponding to HALO_API_KEY_RW             |
 | SLACK_API_TOKEN        | API token for Slack                                 |
-| SLACK_CHANNEL          | Channel Octobot should join and listen.  Octobot will not interact with anyone who is not a member of this channel. |
+| SLACK_CHANNEL          | Channel Cortexbot should join and listen.  Cortexbot will not interact with anyone who is not a member of this channel. |
 
 * For more information on `AWS_ROLE_NAME` and `AWS_ACCOUNT_NUMBERS` settings, refer to
-https://github.com/ashmastaflash/ec2-halo-delta
+https://github.com/cloudpassage/ec2-halo-delta
 
 * Confirm that the configuration for ip blocker and quarantine in
-`octo-box/bot/octo_conf.yml` matches your environment, especially regarding
+`cortex/bot/cortex_conf.yml` matches your environment, especially regarding
 group names, ip list names, and event types.
 
 * As a user who has sufficient access to run Docker containers:
@@ -92,11 +92,11 @@ group names, ip list names, and event types.
 ### Using without Slack
 
 If you prefer not to use Slack, un-comment the line in docker-compose.yml that
-contains `NOSLACK: true`.  This will cause octo-bot to stop and loop before
+contains `NOSLACK: true`.  This will cause cortex-bot to stop and loop before
 attempting to connect to Slack.  To interact with Halo from the command line,
 SSH into the host running docker-compose and run this:
-`sudo docker exec -it octo-bot python /app/interrogate.py`.  You will then
-be dropped into a shell where you can interact with octo-box.  Type `help` and
+`sudo docker exec -it cortex-bot python /app/interrogate.py`.  You will then
+be dropped into a shell where you can interact with cortex.  Type `help` and
 press enter for details on available comands.  Output that is typically
 returned in image form will come back as base64-encoded text.  You can
 copy/paste from the terminal window into a text editor, then run it through
