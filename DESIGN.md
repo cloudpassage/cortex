@@ -6,13 +6,14 @@ Cortex is a collection of Docker containers managed by docker-compose.  All long
 
 ### Cortexbot
 
-Users can interact with Cortex via SSH or Slack integration. Both of these communication paths exist via the `cortexbot` component.  The `cortexbot` component is a long-running container within the Cortex application.  Most of the `cortexbot` component's human interaction functionality is delivered by queueing jobs for the `celeryworker` component, via the `rabbitmq` component.  The task definitions used in the `celeryworker` component are included in the `cortex` component at container image build time.  See bot/Dockerfile for more information.
+Users can interact with Cortex via SSH or Slack integration. Both of these communication paths exist via the `cortexbot` component.  The `cortexbot` component is a long-running container within the Cortex application.  Most of the `cortexbot` component's human interaction functionality is delivered by queueing jobs for the `celeryworker` component, via the `rabbitmq` component.  The task definitions used in the `celeryworker` component are included in the `cortex` component at container image build time. See https://github.com/cloudpassage/don-bot/blob/master/Dockerfile for more information.
 
-Example interaction lifecycle:
+
+### donbot interaction lifecycle (https://github.com/cloudpassage/don-bot):
 
 1. User messages `cortex` in Slack: *donbot servers in group CORTEX*
-1. Message received in channel by `bot/app/runner.py: slack_in_manager()`, placed in `slack_inbound` FIFO.
-1. The `cortex` component pulls the message from `slack_inbound` FIFO and processes in `bot/app/runner.py: daemon_speaker()`
+1. Message received in channel by `app/runner.py: slack_in_manager()`, placed in `slack_inbound` FIFO.
+1. The `cortex` component pulls the message from `slack_inbound` FIFO and processes in `app/runner.py: daemon_speaker()`
 1. The `daemon_speaker()` function calls `donlib.Lexicals.parse()` to determine interaction type and to extract metadata from the user interaction, then calls `halo.interrogate()`.
 1. The `halo_interrogate()` function can perform three different kinds of tasks:
     * `Synchronous`, which are expected to return results fast, and are blocking, though very briefly.
@@ -27,7 +28,7 @@ Example interaction lifecycle:
 
 ### celeryworker
 
-The `celeryworker` component is responsible for dispatching and managing the results for `asynchronous-native` and `asynchronous-containerized` tasks.  Most of the functionality in this component is facilitated by the `halocelery` library, located [here](https://github.com/ashmastaflash/halocelery).
+The `celeryworker` component is responsible for dispatching and managing the results for `asynchronous-native` and `asynchronous-containerized` tasks.  Most of the functionality in this component is facilitated by the `halocelery` library. located at (https://github.com/cloudpassage/halocelery)
 
 ### redis
 
@@ -46,13 +47,16 @@ Flower is a web interface for managing Celery.  This is implemented in Cortex to
 Adding new functionality to Cortex is designed to be straightforward, versatile, and easy to reliably deliver.
 
 1. Create a Docker container image which produces the desired information, encoded in base64, via the container's stdout.  Create this as a completely separate repository in Github and Dockerhub, not in the Cortex repository.  Make sure that your end-to-end testing is rock solid, and you use non-default tags for your codebase and docker image, so you can precisely pin the task in Cortex configuration.
-1. Add an entry into `app/donlib/lexicals.py: get_message_type()` as well as tests in `bot/app/test/unit/test_unit_lexicals.py`.  _DO NOT SKIP ON THE TESTS!_
-1. Create a task definition in the `halocelery` library (`halocelery/tasks.py` and `halocelery/apputils/containerized.py`) to support running the container image you created in the first step.
-1. Add an entry to `bot/app/donlib/halo.py: interrogate()` to call the new task you created the prior step.
+1. In project https://github.com/cloudpassage/don-bot
+  - add an entry into `app/donlib/lexicals.py: get_message_type()` as well as tests in `app/test/unit/test_unit_lexicals.py`.  _DO NOT SKIP ON THE TESTS!_
+1. In project https://github.com/cloudpassage/halocelery
+  - create a task definition in the `halocelery` library (`halocelery/tasks.py` and `halocelery/apputils/containerized.py`) to support running the container image you created in the first step.
+1. In project https://github.com/cloudpassage/don-bot
+  - Add an entry to `app/donlib/halo.py: interrogate()` to call the new task you created the prior step.
 1. Tag a new version of `halocelery` and expand the build instructions in the `fiery-boat` repository to accommodate the new github repository tag you just created.  The `fiery-boat` repository containerizes the `halocelery` library for consumption in other Cortex components.
 1. Re-pin the `fiery-boat` and `halocelery` libraries in the following places:
     * docker-compose.yml:
         * flower
         * celeryworker
         * scheduler
-    * bot/Dockerfile (improvement: this needs to be parameterized in docker-compose.yml)
+    * Dockerfile (https://github.com/cloudpassage/don-bot) (improvement: this needs to be parameterized in docker-compose.yml)
