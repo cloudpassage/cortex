@@ -1,13 +1,12 @@
-# Cortex design
+# Octobox design
 
 ## Design notes
 
-Cortex is a collection of Docker containers managed by docker-compose.  All long-running components are stateless and configured to restart in the event of failure, eliminating the need for human interaction to correct component failure.
+Octobox is a collection of Docker containers managed by docker-compose.  All long-running components are stateless and configured to restart in the event of failure, eliminating the need for human interaction to correct component failure.
 
-### Cortexbot
+### octobot
 
 Users can interact with Cortex via SSH or Slack integration. Both of these communication paths exist via the `cortexbot` component.  The `cortexbot` component is a long-running container within the Cortex application.  Most of the `cortexbot` component's human interaction functionality is delivered by queueing jobs for the `celeryworker` component, via the `rabbitmq` component.  The task definitions used in the `celeryworker` component are included in the `cortex` component at container image build time. See https://github.com/cloudpassage/don-bot/blob/master/Dockerfile for more information.
-
 
 ### donbot interaction lifecycle (https://github.com/cloudpassage/don-bot):
 
@@ -19,7 +18,7 @@ Users can interact with Cortex via SSH or Slack integration. Both of these commu
     * `Synchronous`, which are expected to return results fast, and are blocking, though very briefly.
     * `Asynchronous-containerized`, which are triggered via the `celeryworker` component and use short-running containers to produce the information the user requests.
     * `Asynchronous-native`, which uses Python code that ships in the `celeryworker` itself, which in turn produces the information that the user requests.
-1. If the `halo_interrogate()` function creates a synchronous task, it places the results of the task directly into the `slack_outbound` FIFO queue.  In the case of an asynchronous task (native or containerized), an `AsynchronousTaskObject` (which is a Celery construct) is placed in the `async_jobs` FIFO queue.
+1. If the `halo_interrogate()` function creates a synchronous task, it places the results of the task directly into the `slack_outbound` FIFO queue.  In the case of an asynchronous task (native or containerized), an `AsynchronousTaskObject` (which is a Celery construct) is placed in the `async_jobs` FIFO queue.  
 1. In the case of the example message above, an `asynchronous-native` task is created.
 1. The `asynchronous-native` task causes a message to be placed into the `rabbitmq` component, which is in turn picked up by the `celeryworker` component.
 1. The `celeryworker` component works the task to completion, places the full results in the `redis` component, and the corresponding `AsynchronousTaskObject` is marked as being completed.
@@ -40,11 +39,11 @@ The `scheduler` component is responsible for triggering timed tasks (like cron j
 
 ### flower
 
-Flower is a web interface for managing Celery.  This is implemented in Cortex to give us access to task history via the *donbot tasks* command and is not, by default, exposed outside of the Docker-internal network.
+Flower is a web interface for managing Celery.  This is implemented in Octobox to give us access to task history via the *donbot tasks* command and is not, by default, exposed outside of the Docker-internal network.
 
 ## Adding functionality
 
-Adding new functionality to Cortex is designed to be straightforward, versatile, and easy to reliably deliver.
+Adding new functionality to Octobox is designed to be straightforward, versatile, and easy to reliably deliver.
 
 1. Create a Docker container image which produces the desired information, encoded in base64, via the container's stdout.  Create this as a completely separate repository in Github and Dockerhub, not in the Cortex repository.  Make sure that your end-to-end testing is rock solid, and you use non-default tags for your codebase and docker image, so you can precisely pin the task in Cortex configuration.
 1. In project https://github.com/cloudpassage/don-bot
