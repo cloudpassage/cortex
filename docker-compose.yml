@@ -1,4 +1,8 @@
-version: '2'
+version: '3.4'
+x-halocelery_version:
+  &default_halocelery_version docker.io/halotools/halocelery:v0.4.9
+x-donbot_version:
+  &default_donbot_version docker.io/halotools/don-bot:v0.17.2
 
 services:
   rabbitmq:
@@ -12,14 +16,14 @@ services:
       - cortex
   flower:
     container_name: flower
-    image: docker.io/halotools/halocelery:latest
+    image: *default_halocelery_version
     command: celery flower -A halocelery --address=0.0.0.0 --port=5555 -l INFO
     environment:
       CELERY_BACKEND_URL: redis://redis
       CELERY_BROKER_URL: amqp://guest:guest@rabbitmq:5672//
 ####################################
 #    Flower doesn't use SSL, so only enable this in a controlled
-#    troubleshooting environment.  CORTEX-BOT can list tasks for you with
+#    troubleshooting environment.  DON-BOT can list tasks for you with
 #    "donbot tasks"
 #
 #    ports:
@@ -36,7 +40,7 @@ services:
       - cortex
   celeryworker:
     container_name: celeryworker
-    image: docker.io/halotools/halocelery:latest
+    image: *default_halocelery_version
     command: celery worker -A halocelery -l INFO
     user: root
     restart: always
@@ -78,7 +82,7 @@ services:
       - cortex
   scheduler:
     container_name: scheduler
-    image: docker.io/halotools/halocelery:latest
+    image: *default_halocelery_version
     command: celery beat -A halocelery -l INFO
     restart: always
     depends_on:
@@ -104,9 +108,9 @@ services:
       EVENTS_S3_BUCKET: ${EVENTS_S3_BUCKET}
     networks:
       - cortex
-  cortexbot:
-    container_name: cortex-bot
-    image: docker.io/halotools/don-bot:latest
+  donbot:
+    container_name: don-bot
+    image: *default_donbot_version
     restart: always
     read_only: true
     depends_on:

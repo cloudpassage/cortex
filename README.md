@@ -36,13 +36,13 @@ sense for your environment, using your favorite automation tools.
     * Bot running configuration (enabled features)
     * Bot command reference (`donbot help`)
 * Quarantine
-  * Configuration in bot/cortex-conf.yml
+  * Configuration in bot/cortex-conf.yml (https://github.com/cloudpassage/don-bot/blob/master/cortex_conf.yml)
   * Quarantine criteria:
     * Server group
     * Event type
     * Event criticality
 * IP-Blocker
-  * Configuration in bot/cortex-conf.yml
+  * Configuration in bot/cortex-conf.yml (https://github.com/cloudpassage/don-bot/blob/master/cortex_conf.yml)
     * IP zone name
     * Event type
     * Event criticality
@@ -77,27 +77,27 @@ sense for your environment, using your favorite automation tools.
 | HALO_API_KEY_RW        | Read-Write API key for Halo                         |
 | HALO_API_SECRET_KEY_RW | Secret corresponding to HALO_API_KEY_RW             |
 | SLACK_API_TOKEN        | API token for Slack                                 |
-| SLACK_CHANNEL          | Channel Cortexbot should join and listen.  Cortexbot will not interact with anyone who is not a member of this channel. |
+| SLACK_CHANNEL          | Channel Donbot should join and listen. Donbot will not interact with anyone who is not a member of this channel. |
 
 * For more information on `AWS_ROLE_NAME` and `AWS_ACCOUNT_NUMBERS` settings, refer to
 https://github.com/cloudpassage/ec2-halo-delta
 
 * In project don-bot (https://github.com/cloudpassage/don-bot)
 
-* Confirm that the configuration for ip blocker and quarantine in
+  - Confirm that the configuration for ip blocker and quarantine in
 `cortex_conf.yml` matches your environment, especially regarding
 group names, ip list names, and event types.
 
-* As a user who has sufficient access to run Docker containers:
+  - As a user who has sufficient access to run Docker containers:
 `docker-compose up -d --build`
 
 ### Using without Slack
 
 If you prefer not to use Slack, un-comment the line in docker-compose.yml that
-contains `NOSLACK: true`.  This will cause cortex-bot to stop and loop before
+contains `NOSLACK: true`.  This will cause donbot to stop and loop before
 attempting to connect to Slack.  To interact with Halo from the command line,
 SSH into the host running docker-compose and run this:
-`sudo docker exec -it cortex-bot python /app/interrogate.py`.  You will then
+`sudo docker exec -it don-bot python /app/interrogate.py`.  You will then
 be dropped into a shell where you can interact with cortex.  Type `help` and
 press enter for details on available comands.  Output that is typically
 returned in image form will come back as base64-encoded text.  You can
