@@ -36,21 +36,13 @@ sense for your environment, using your favorite automation tools.
     * Bot running configuration (enabled features)
     * Bot command reference (`donbot help`)
 * Quarantine
-<<<<<<< HEAD
-  * Configuration in bot/cortex-conf.yml (https://github.com/cloudpassage/don-bot/blob/master/cortex_conf.yml)
-=======
   * Configuration in cortex-conf.yml (https://github.com/cloudpassage/don-bot/blob/master/cortex_conf.yml)
->>>>>>> f3353825f61976464e35ca973edf00b97a0cade5
   * Quarantine criteria:
     * Server group
     * Event type
     * Event criticality
 * IP-Blocker
-<<<<<<< HEAD
-  * Configuration in bot/cortex-conf.yml (https://github.com/cloudpassage/don-bot/blob/master/cortex_conf.yml)
-=======
   * Configuration in cortex-conf.yml (https://github.com/cloudpassage/don-bot/blob/master/cortex_conf.yml)
->>>>>>> f3353825f61976464e35ca973edf00b97a0cade5
     * IP zone name
     * Event type
     * Event criticality
