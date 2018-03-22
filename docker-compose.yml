@@ -2,7 +2,7 @@ version: '3.4'
 x-halocelery_version:
   &default_halocelery_version docker.io/halotools/halocelery:v0.4.9
 x-donbot_version:
-  &default_donbot_version docker.io/halotools/don-bot:v0.17.2
+  &default_donbot_version docker.io/halotools/don-bot:develop
 
 services:
   rabbitmq:
@@ -119,6 +119,8 @@ services:
       - "rabbitmq:5672"
       - "redis:6379"
       - "flower:5555"
+    env_file:
+      - cortex_conf.env
     environment:
       # NOSLACK: "true"
       CELERY_BACKEND_URL: redis://redis
