@@ -92,7 +92,7 @@ https://github.com/cloudpassage/ec2-halo-delta
 group names, ip list names, and event types.
 
 * As a user who has sufficient access to run Docker containers:
-`docker-compose up -d --build`
+`docker-compose --compatibility up -d --build`
 
 ### Using without Slack
 
