@@ -1,6 +1,6 @@
 version: '3.4'
 x-halocelery_version:
-  &default_halocelery_version docker.io/halotools/halocelery:v0.4.9
+  &default_halocelery_version docker.io/halotools/halocelery:v0.5.0
 x-donbot_version:
   &default_donbot_version docker.io/halotools/don-bot:v0.17.3
 x-celery_env_vars:
