@@ -3,12 +3,21 @@ x-halocelery_version:
   &default_halocelery_version docker.io/halotools/halocelery:v0.4.9
 x-donbot_version:
   &default_donbot_version docker.io/halotools/don-bot:v0.17.3
+x-celery_env_vars:
+  &default_celery_env_vars
+  CELERY_BACKEND_URL: redis://redis
+  CELERY_BROKER_URL: amqp://guest:guest@rabbitmq:5672//
+  CONTAINER_MEM_LIMIT: 256m
 
 services:
   rabbitmq:
     container_name: rabbitmq
     hostname: rabbitmq
     image: docker.io/rabbitmq:3-management
+    deploy:
+      resources:
+        limits:
+          memory: 256M
     restart: always
     depends_on:
       - redis
@@ -17,10 +26,13 @@ services:
   flower:
     container_name: flower
     image: *default_halocelery_version
+    deploy:
+      resources:
+        limits:
+          memory: 256M
     command: celery flower -A halocelery --address=0.0.0.0 --port=5555 -l INFO
     environment:
-      CELERY_BACKEND_URL: redis://redis
-      CELERY_BROKER_URL: amqp://guest:guest@rabbitmq:5672//
+      << : *default_celery_env_vars
 ####################################
 #    Flower doesn't use SSL, so only enable this in a controlled
 #    troubleshooting environment.  DON-BOT can list tasks for you with
@@ -41,12 +53,16 @@ services:
   celeryworker:
     container_name: celeryworker
     image: *default_halocelery_version
+    deploy:
+      resources:
+        limits:
+          memory: 256M
     command: celery worker -A halocelery -l INFO
     user: root
     restart: always
     environment:
-      CELERY_BACKEND_URL: redis://redis
-      CELERY_BROKER_URL: amqp://guest:guest@rabbitmq:5672//
+      << : *default_celery_env_vars
+
 #####################################
 # API keys, account information
 #####################################
@@ -77,12 +93,20 @@ services:
   redis:
     container_name: redis
     image: docker.io/redis:3-alpine
+    deploy:
+      resources:
+        limits:
+          memory: 256M
     restart: always
     networks:
       - cortex
   scheduler:
     container_name: scheduler
     image: *default_halocelery_version
+    deploy:
+      resources:
+        limits:
+          memory: 256M
     command: celery beat -A halocelery -l INFO
     restart: always
     depends_on:
@@ -92,12 +116,11 @@ services:
       - "redis:6379"
       - "flower:5555"
     environment:
+      << : *default_celery_env_vars
       EVENT_EXPORT_HOUR: 19
       EVENT_EXPORT_MIN: 21
       SCAN_EXPORT_HOUR: 19
       SCAN_EXPORT_MIN: 21
-      CELERY_BACKEND_URL: redis://redis
-      CELERY_BROKER_URL: amqp://guest:guest@rabbitmq:5672//
       FLOWER_HOST: http://flower:5555
       SLACK_API_TOKEN: ${SLACK_API_TOKEN}
       SLACK_CHANNEL: ${SLACK_CHANNEL}
@@ -111,6 +134,10 @@ services:
   donbot:
     container_name: don-bot
     image: *default_donbot_version
+    deploy:
+      resources:
+        limits:
+          memory: 256M
     restart: always
     read_only: true
     depends_on:
@@ -122,9 +149,8 @@ services:
     env_file:
       - cortex_conf.env
     environment:
+      << : *default_celery_env_vars
       # NOSLACK: "true"
-      CELERY_BACKEND_URL: redis://redis
-      CELERY_BROKER_URL: amqp://guest:guest@rabbitmq:5672//
       FLOWER_HOST: http://flower:5555
       HALO_API_KEY: ${HALO_API_KEY}
       HALO_API_SECRET_KEY: ${HALO_API_SECRET_KEY}

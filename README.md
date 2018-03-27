@@ -57,6 +57,9 @@ sense for your environment, using your favorite automation tools.
 ### Requirements
 
 * docker-compose (https://docs.docker.com/compose/install/)
+* For AWS ec2 instance, it is recommended to use:
+  - Ubuntu 16.04
+  - t2.medium (Variable ECUs, 2 vCPUs, 2.3 GHz, Intel Broadwell E5-2686v4, 4 GiB memory, EBS only)
 
 ### Use
 
@@ -89,7 +92,7 @@ https://github.com/cloudpassage/ec2-halo-delta
 group names, ip list names, and event types.
 
 * As a user who has sufficient access to run Docker containers:
-`docker-compose up -d --build`
+`docker-compose --compatibility up -d --build`
 
 ### Using without Slack
 
