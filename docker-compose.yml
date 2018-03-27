@@ -9,6 +9,10 @@ services:
     container_name: rabbitmq
     hostname: rabbitmq
     image: docker.io/rabbitmq:3-management
+    deploy:
+      resources:
+        limits:
+          memory: 256M
     restart: always
     depends_on:
       - redis
@@ -17,6 +21,10 @@ services:
   flower:
     container_name: flower
     image: *default_halocelery_version
+    deploy:
+      resources:
+        limits:
+          memory: 256M
     command: celery flower -A halocelery --address=0.0.0.0 --port=5555 -l INFO
     environment:
       CELERY_BACKEND_URL: redis://redis
@@ -41,6 +49,10 @@ services:
   celeryworker:
     container_name: celeryworker
     image: *default_halocelery_version
+    deploy:
+      resources:
+        limits:
+          memory: 256M
     command: celery worker -A halocelery -l INFO
     user: root
     restart: always
@@ -77,12 +89,20 @@ services:
   redis:
     container_name: redis
     image: docker.io/redis:3-alpine
+    deploy:
+      resources:
+        limits:
+          memory: 256M
     restart: always
     networks:
       - cortex
   scheduler:
     container_name: scheduler
     image: *default_halocelery_version
+    deploy:
+      resources:
+        limits:
+          memory: 256M
     command: celery beat -A halocelery -l INFO
     restart: always
     depends_on:
@@ -111,6 +131,10 @@ services:
   donbot:
     container_name: don-bot
     image: *default_donbot_version
+    deploy:
+      resources:
+        limits:
+          memory: 256M
     restart: always
     read_only: true
     depends_on:
