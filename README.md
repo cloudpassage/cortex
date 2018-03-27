@@ -57,6 +57,9 @@ sense for your environment, using your favorite automation tools.
 ### Requirements
 
 * docker-compose (https://docs.docker.com/compose/install/)
+* For AWS ec2 instance, it is recommended to use:
+  - Ubuntu 16.04
+  - t2.medium (Variable ECUs, 2 vCPUs, 2.3 GHz, Intel Broadwell E5-2686v4, 4 GiB memory, EBS only)
 
 ### Use
 
