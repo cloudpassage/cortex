@@ -1,6 +1,6 @@
 # CORTEX
 
-## CORTEX prototype platform
+## CORTEX integration platform
 
 This integration package is designed to get you up and running with Halo
 _really_ fast.  It's also been designed with the idea that you want to build
