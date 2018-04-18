@@ -8,6 +8,9 @@ x-celery_env_vars:
   CELERY_BACKEND_URL: redis://redis
   CELERY_BROKER_URL: amqp://guest:guest@rabbitmq:5672//
   CONTAINER_MEM_LIMIT: 256m
+x-proxy_env_vars:
+  &default_proxy_env_vars
+  HTTPS_PROXY: ${HTTPS_PROXY_URL}
 
 services:
   rabbitmq:
@@ -19,6 +22,8 @@ services:
         limits:
           memory: 256M
     restart: always
+    environment:
+      << : *default_proxy_env_vars
     depends_on:
       - redis
     networks:
@@ -33,6 +38,7 @@ services:
     command: celery flower -A halocelery --address=0.0.0.0 --port=5555 -l INFO
     environment:
       << : *default_celery_env_vars
+      << : *default_proxy_env_vars
 ####################################
 #    Flower doesn't use SSL, so only enable this in a controlled
 #    troubleshooting environment.  DON-BOT can list tasks for you with
@@ -62,6 +68,7 @@ services:
     restart: always
     environment:
       << : *default_celery_env_vars
+      << : *default_proxy_env_vars
 
 #####################################
 # API keys, account information
@@ -97,6 +104,8 @@ services:
       resources:
         limits:
           memory: 256M
+    environment:
+      << : *default_proxy_env_vars
     restart: always
     networks:
       - cortex
@@ -117,6 +126,7 @@ services:
       - "flower:5555"
     environment:
       << : *default_celery_env_vars
+      << : *default_proxy_env_vars
       EVENT_EXPORT_HOUR: 19
       EVENT_EXPORT_MIN: 21
       SCAN_EXPORT_HOUR: 19
@@ -150,6 +160,7 @@ services:
       - cortex_conf.env
     environment:
       << : *default_celery_env_vars
+      << : *default_proxy_env_vars
       # NOSLACK: "true"
       FLOWER_HOST: http://flower:5555
       HALO_API_KEY: ${HALO_API_KEY}
