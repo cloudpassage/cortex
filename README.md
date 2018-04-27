@@ -81,6 +81,7 @@ sense for your environment, using your favorite automation tools.
 | HALO_API_SECRET_KEY_RW | Secret corresponding to HALO_API_KEY_RW             |
 | SLACK_API_TOKEN        | API token for Slack                                 |
 | SLACK_CHANNEL          | Channel Donbot should join and listen. Donbot will not interact with anyone who is not a member of this channel. |
+| HTTPS_PROXY_URL        | If server routes through a proxy. Format is ip:port |
 
 * For more information on `AWS_ROLE_NAME` and `AWS_ACCOUNT_NUMBERS` settings, refer to
 https://github.com/cloudpassage/ec2-halo-delta
