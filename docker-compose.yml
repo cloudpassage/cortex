@@ -1,8 +1,8 @@
 version: '3.4'
 x-halocelery_version:
-  &default_halocelery_version docker.io/halotools/halocelery:v0.6.0
+  &default_halocelery_version docker.io/halotools/halocelery:v0.7.0
 x-donbot_version:
-  &default_donbot_version docker.io/halotools/don-bot:v0.17.6
+  &default_donbot_version docker.io/halotools/don-bot:v0.18.0
 x-celery_env_vars:
   &default_celery_env_vars
   CELERY_BACKEND_URL: redis://redis
