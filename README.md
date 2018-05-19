@@ -58,13 +58,43 @@ sense for your environment, using your favorite automation tools.
 
 * docker-compose (https://docs.docker.com/compose/install/)
 * For AWS ec2 instance, it is recommended to use:
-  - Ubuntu 16.04
-  - t2.medium (Variable ECUs, 2 vCPUs, 2.3 GHz, Intel Broadwell E5-2686v4, 4 GiB memory, EBS only)
+  * Ubuntu 16.04
+  * t2.medium (Variable ECUs, 2 vCPUs, 2.3 GHz, Intel Broadwell E5-2686v4, 4
+    GiB memory, EBS only)
+* API keys for adjacent systems (AWS, Slack, Halo)
+  * Access requirements by feature:
+    * Scans and events to S3
+      * Halo read-only API keys (general requirement for basic Cortex operation-
+        see table below)
+      * Target S3 buckets (`SCANS_S3_BUCKET`, `EVENTS_S3_BUCKET`) for receiving
+      scans and events must exist; this integration does not create S3 buckets.
+      * API keys must be able to create and update files in target S3 buckets.
+    * Halo EC2 Delta reporter
+      * Read-only Halo API keys (general requirement for basic Cortex operation-
+        see table below)
+      * AWS API keys must be able to read EC2 metadata. For scanning multiple
+        accounts, read the [implementation notes](https://github.com/cloudpassage/ec2-halo-delta#implementation-notes)
+    * Quarantine, IP Blocker:
+      * Halo administrative-level API keys are required for both Quarantine and IP Blocker (see `HALO_API_KEY_RW` and `HALO_API_SECRET_KEY_RW`, below).
+      * Duplicated group names are not supported for monitored or quarantine group.  See [Quarantine docs](https://github.com/cloudpassage/don-bot/blob/master/QUARANTINE.md)
+      * Duplicated group names for monitored groups in IP Blocker configuration are not
+      supported.  See [IP Blocker documentation](https://github.com/cloudpassage/don-bot/blob/master/IP_BLOCKER.md)
+      for details.
+    * Slack integration
+      * CloudPassage Halo read-only API keys (a default requirement for basic Cortex operation)
+      * A [Slack bot user API token](https://api.slack.com/docs/token-types#bot)
+      is required to enable don-bot.
 
-### Use
 
-* Clone this repository
-* Navigate to the root directory of this repository
+### Setup and Use
+
+* Create a virtual machine or cloud instance for hosting Cortex, which meets or
+exceeds instance sizing in `Requirements`, above.
+* Install [docker-ce](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
+and [docker-compose](https://docs.docker.com/compose/install/) on the Cortex
+instance you just created.
+* Use git to clone this repository into the Cortex instance.
+* Navigate to the root directory of the cloned repository.
 * Set these environment variables:
 
 | Variable               | Purpose                                             |
@@ -77,20 +107,19 @@ sense for your environment, using your favorite automation tools.
 | EVENTS_S3_BUCKET       | Name of S3 bucket for events archive                |
 | HALO_API_KEY           | Read-only API key for Halo                          |
 | HALO_API_SECRET_KEY    | Secret corresponding to HALO_API_KEY                |
-| HALO_API_KEY_RW        | Read-Write API key for Halo                         |
-| HALO_API_SECRET_KEY_RW | Secret corresponding to HALO_API_KEY_RW             |
-| SLACK_API_TOKEN        | API token for Slack                                 |
-| SLACK_CHANNEL          | Channel Donbot should join and listen. Donbot will not interact with anyone who is not a member of this channel. |
+| HALO_API_KEY_RW        | Read-Write API key for Halo (Only required if you're using IP-Blocker and Quarantine) |
+| HALO_API_SECRET_KEY_RW | Secret corresponding to HALO_API_KEY_RW (Only required if you're using IP-Blocker and Quarantine) |
+| SLACK_API_TOKEN        | (optional) API token for Slack                      |
+| SLACK_CHANNEL          | (optional) Channel Donbot should join and listen. Donbot will not interact with anyone who is not a member of this channel. |
 | HTTPS_PROXY_URL        | If server routes through a proxy. Format is ip:port |
 
-* For more information on `AWS_ROLE_NAME` and `AWS_ACCOUNT_NUMBERS` settings, refer to
-https://github.com/cloudpassage/ec2-halo-delta
+* For more information on `AWS_ROLE_NAME` and `AWS_ACCOUNT_NUMBERS` settings,
+refer to https://github.com/cloudpassage/ec2-halo-delta
 
-* In project don-bot (https://github.com/cloudpassage/don-bot)
-
-  - Confirm that the configuration for ip blocker and quarantine in
-`cortex_conf.yml` matches your environment, especially regarding
-group names, ip list names, and event types.
+* Confirm that the configuration for ip blocker and quarantine in
+`cortex_conf.yml` (found in the root directory of this repository) matches your
+environment's requirements, especially regarding group names, ip list names, and
+event types.
 
 * As a user who has sufficient access to run Docker containers:
 `docker-compose --compatibility up -d --build`
