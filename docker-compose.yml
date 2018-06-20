@@ -1,8 +1,8 @@
 version: '3.4'
 x-halocelery_version:
-  &default_halocelery_version docker.io/halotools/halocelery:feature_CS-546
+  &default_halocelery_version docker.io/halotools/halocelery:v0.8
 x-donbot_version:
-  &default_donbot_version docker.io/halotools/don-bot:feature_CS-546
+  &default_donbot_version docker.io/halotools/don-bot:v0.19
 x-celery_env_vars:
   &default_celery_env_vars
   CELERY_BACKEND_URL: redis://redis
@@ -167,10 +167,8 @@ services:
       #####################################
       # Donbot's containerized task image versions
       #####################################
-      EC2_HALO_DELTA_VERSION: v0.1
-      FIREWALL_GRAPH_VERSION: 0.1.1
-      SCANS_TO_S3_VERSION: v0.17
-      EVENTS_TO_S3_VERSION: v0.10
+      EC2_HALO_DELTA_VERSION: v0.2
+      FIREWALL_GRAPH_VERSION: v0.2
     networks:
       - cortex
 
