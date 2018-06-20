@@ -32,7 +32,14 @@ The `redis` component holds the results of completed asynchronous tasks.
 
 ### scheduler
 
-The `scheduler` component is responsible for triggering timed tasks (like cron jobs), like the event and scan shippers.  This long-running container incorporates the task definitions from the `halocelery` library.
+The `scheduler` component is responsible for triggering timed tasks (like cron
+jobs), like the event and scan shippers.  This long-running container
+builds its scheduled job configuration based on configuration files.
+To add tasks to the scheduler, you should add correctly-formatted configuration
+files to `config/enabled` in the cortex repository and restart the scheduler
+with `docker restart scheduler`. For details on the file format required for
+custom scheduled tasks, see the `example.conf` file in the halocelery
+repository [here](https://github.com/cloudpassage/halocelery).
 
 ### flower
 
