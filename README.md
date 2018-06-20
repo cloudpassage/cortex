@@ -48,16 +48,16 @@ sense for your environment, using your favorite automation tools.
     * Event criticality
 * Critical Events Monitor
   * Send critical events to Slack channel
-* Scans to S3 (daily job)
-  * Send all scans for prior day to S3
-* Events to S3 (daily job)
-  * Send all events from prior day to S3
+* Scans to S3 (daily task)
+  * Send all scans for prior day to S3 (see `scheduler configuration`, below)
+* Events to S3 (daily task)
+  * Send all events from prior day to S3 (see `scheduler configuration`, below)
 
 
 ### Requirements
 
 * docker-compose (https://docs.docker.com/compose/install/)
-* For AWS ec2 instance, it is recommended to use:
+* For AWS EC2 instance, it is recommended to use:
   * Ubuntu 16.04
   * t2.medium (Variable ECUs, 2 vCPUs, 2.3 GHz, Intel Broadwell E5-2686v4, 4
     GiB memory, EBS only)
@@ -103,8 +103,6 @@ instance you just created.
 | AWS_SECRET_ACCESS_KEY  | Secret key corresponding to AWS_ACCESS_KEY_ID       |
 | AWS_ROLE_NAME          | (Optional) Role to assume via STS, for cross-account inventory.|
 | AWS_ACCOUNT_NUMBERS    | (Optional) Semicolon-delimited list of account numbers having `AWS_ROLE_NAME` |
-| SCANS_S3_BUCKET        | Name of S3 bucket for scan archive                  |
-| EVENTS_S3_BUCKET       | Name of S3 bucket for events archive                |
 | HALO_API_KEY           | Read-only API key for Halo                          |
 | HALO_API_SECRET_KEY    | Secret corresponding to HALO_API_KEY                |
 | HALO_API_KEY_RW        | Read-Write API key for Halo (Only required if you're using IP-Blocker and Quarantine) |
@@ -123,6 +121,65 @@ event types.
 
 * As a user who has sufficient access to run Docker containers:
 `docker-compose --compatibility up -d --build`
+
+### Scheduler Configuration
+
+Cortex has a built-in task scheduler for performing regular batch-type
+integrations. Two such task definitions are included with Cortex, and are
+very easy and straightforward to configure:
+
+* `scheduled_events_to_s3.conf`
+  * Copy the `scheduled_events_to_s3.conf` file from `config/available/` to the
+  `config/enabled/` directory.
+  * Open the `config/enabled/scheduled_events_to_s3.conf` file with your
+  favorite editor and set the value for `AWS_S3_BUCKET` to the name of the
+  S3 bucket you would like to send your Halo events to.
+  * Finally, restart the Cortex scheduler by running `docker restart scheduler`.
+  * Confirm that the scheduler picked up the configuration by running
+  `docker logs scheduler` and looking for the task's configuration to be
+  printed. (see below section on scheduler logs)
+
+* `scheduled_scans_to_s3.conf`
+  * Same process as `scheduled_events_to_s3.conf`; both configuration files are
+  nearly identical. Copy the file to `config/enabled/`, set the `AWS_S3_BUCKET`
+  variable, and restart the scheduler, as described above.
+
+When examining scheduler startup logs (docker logs scheduler) to confirm the
+correct consumption of scheduled task configuration, this is similar to what
+you'll see:
+
+```
+
+ConfigManager: Parsing config file: /etc/config/scheduled_events_to_s3.conf
+ConfigManager: Parsing config file: /etc/config/scheduled_scans_to_s3.conf
+Scheduled tasks:
+Task: scans_to_s3
+Container image: docker.io/halotools/halo-scans-archiver:feature_CS-554
+Retries: 5
+Schedule:
+	Minute: 01
+	Hour: 12
+	Day of week: *
+	Day of month: *
+	Month of year: *
+===
+Task: events_to_s3
+Container image: docker.io/halotools/halo-events-archiver:feature_CS-555
+Retries: 5
+Schedule:
+	Minute: 01
+	Hour: 12
+	Day of week: *
+	Day of month: *
+	Month of year: *
+
+```
+
+Notice that the ConfigManager parses two config files in the above example,
+then prints the basic task configuration for both.  This output is useful to
+confirm the correct consumption of basic task configuration. Any files which
+are found in the `config/enabled/` directory which don't contain the correct
+configuration sections will be ignored.
 
 ### Using without Slack
 
