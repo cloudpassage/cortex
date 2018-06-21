@@ -110,7 +110,7 @@ services:
       resources:
         limits:
           memory: 256M
-    command: unbuffer celery beat -A halocelery -l INFO
+    command: unbuffer celery beat -A halocelery -l INFO --pidfile=
     restart: always
     depends_on:
       - celeryworker
