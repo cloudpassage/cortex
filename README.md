@@ -1,5 +1,7 @@
 # CORTEX
 
+Version 1.1
+
 ## CORTEX integration platform
 
 This integration package is designed to get you up and running with Halo
