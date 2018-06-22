@@ -1,0 +1,32 @@
+{
+  "lids_policy": {
+    "name": "Cortex Scheduler",
+    "module": "lids",
+    "description": "Monitor log messages from Cortex scheduler",
+    "platform": "linux",
+    "template": false,
+    "shared": true,
+    "read_only": false,
+    "target_type": "server",
+    "rules": [
+      {
+        "name": "Failed export of events to S3",
+        "kind": "text",
+        "search_pattern": "Halocelery: TaskRunner Failure: Failed to export yesterday's Halo scans to S3",
+        "critical": true,
+        "active": true,
+        "alert": false,
+        "file_path": "/var/log/messages"
+      },
+      {
+        "name": "Failed export of scans to S3",
+        "kind": "text",
+        "search_pattern": "Halocelery: TaskRunner Failure: Failed to export yesterday's Halo events to S3",
+        "critical": true,
+        "active": true,
+        "alert": false,
+        "file_path": "/var/log/messages"
+      }
+    ]
+  }
+}
