@@ -181,6 +181,46 @@ confirm the correct consumption of basic task configuration. Any files which
 are found in the `config/enabled/` directory which don't contain the correct
 configuration sections will be ignored.
 
+### Monitoring Cortex's scheduled tasks
+
+A CloudPassage Log-Based IDS (LIDS) policy is included in this repository to
+enable logging and alerting for failed scheduled tasks.
+
+In order to enable this functionality, a few more configuration steps must be
+performed:
+
+* Configure Docker to log to journald
+  * In order for 'docker logs CONTAINER_NAME' to work, and to get container
+  logs to syslog where the Halo agent can detect events, we must first direct
+  all container logs to journald.
+  * Instructions here: https://docs.docker.com/config/containers/logging/journald/
+* Configure journald to log to syslog
+  * In order for the container log messages to be available to the Halo agent,
+  we must send these log messages to a file.
+  * We will configure journald to forward log messages to syslog. See
+  https://www.freedesktop.org/software/systemd/man/journald.conf.html for
+  information on using the journald.conf file to customize journald's behavior.
+  Hint: `ForwardToSyslog` is the setting to enable.
+  * Once `ForwardToSyslog` has been enabled, restart the journald service with
+  `service systemd-journald restart`
+  * On Ubuntu 16.04, the file which will contain the container log messages is
+  `/var/log/messages`
+* Install the Halo agent on the instance hosting Cortex
+  * Installing the Halo agent:
+  https://support.cloudpassage.com/hc/en-us/articles/228558687-Installing-Halo-Agents
+* Install the LIDS policy to monitor Cortex scheduler logs with Halo
+  * Download the policy file from this repository, located at
+  `policies/cortex-scheduler.json`
+  * Log into Halo and click on `Policies`
+  * Click on `Actions > Import Policy`
+  * Browse to and select the policy file you downloaded, and click
+  `Import Policies`
+  * In the Halo portal, navigate to the server group containing the host
+  running Cortex. Edit the group's settings and assign the LIDS policy you just
+  uploaded.
+
+
+
 ### Using without Slack
 
 If you prefer not to use Slack, un-comment the line in docker-compose.yml that
