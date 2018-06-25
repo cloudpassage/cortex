@@ -11,6 +11,9 @@ x-celery_env_vars:
 x-proxy_env_vars:
   &default_proxy_env_vars
   HTTPS_PROXY: ${HTTPS_PROXY_URL}
+x-api_env_vars:
+  &default_api_env_vars
+  HALO_API_HOSTNAME: api.cloudpassage.com
 
 services:
 #####################################
@@ -70,12 +73,14 @@ services:
     environment:
       << : *default_celery_env_vars
       << : *default_proxy_env_vars
+      << : *default_api_env_vars
       HALO_API_KEY: ${HALO_API_KEY}
       HALO_API_SECRET_KEY: ${HALO_API_SECRET_KEY}
       HALO_API_KEY_RW: ${HALO_API_KEY_RW}
       HALO_API_SECRET_KEY_RW: ${HALO_API_SECRET_KEY_RW}
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      SLACK_API_TOKEN: ${SLACK_API_TOKEN}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     depends_on:
@@ -121,10 +126,6 @@ services:
       << : *default_celery_env_vars
       << : *default_proxy_env_vars
       FLOWER_HOST: http://flower:5555
-      SLACK_API_TOKEN: ${SLACK_API_TOKEN}
-      SLACK_CHANNEL: ${SLACK_CHANNEL}
-      SCANS_S3_BUCKET: ${SCANS_S3_BUCKET}
-      EVENTS_S3_BUCKET: ${EVENTS_S3_BUCKET}
       HALOCELERY_CONFIG_DIR: /etc/config/
     volumes:
       - "./config/enabled/:/etc/config/"
@@ -153,6 +154,7 @@ services:
     environment:
       << : *default_celery_env_vars
       << : *default_proxy_env_vars
+      << : *default_api_env_vars
       # NOSLACK: "true"
       FLOWER_HOST: http://flower:5555
       HALO_API_KEY: ${HALO_API_KEY}
