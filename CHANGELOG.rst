@@ -44,6 +44,11 @@ New
 Changes
 ~~~~~~~
 
+- Adding Halo API hostname to docker-compose.yml. [Ash Wilson]
+
+  For use with non-default Halo API host, change the value for
+  HALO_API_HOSTNAME in docker-compose.yml.
+
 - Remove 'server compliance graph' feature.  Add 'ec2 halo footprint
   csv'. [Ash Wilson]
 
