@@ -1,5 +1,7 @@
 # CORTEX
 
+Version 1.1
+
 ## CORTEX integration platform
 
 This integration package is designed to get you up and running with Halo
@@ -48,23 +50,53 @@ sense for your environment, using your favorite automation tools.
     * Event criticality
 * Critical Events Monitor
   * Send critical events to Slack channel
-* Scans to S3 (daily job)
-  * Send all scans for prior day to S3
-* Events to S3 (daily job)
-  * Send all events from prior day to S3
+* Scans to S3 (daily task)
+  * Send all scans for prior day to S3 (see `scheduler configuration`, below)
+* Events to S3 (daily task)
+  * Send all events from prior day to S3 (see `scheduler configuration`, below)
 
 
 ### Requirements
 
 * docker-compose (https://docs.docker.com/compose/install/)
-* For AWS ec2 instance, it is recommended to use:
-  - Ubuntu 16.04
-  - t2.medium (Variable ECUs, 2 vCPUs, 2.3 GHz, Intel Broadwell E5-2686v4, 4 GiB memory, EBS only)
+* For AWS EC2 instance, it is recommended to use:
+  * Ubuntu 16.04
+  * t2.medium (Variable ECUs, 2 vCPUs, 2.3 GHz, Intel Broadwell E5-2686v4, 4
+    GiB memory, EBS only)
+* API keys for adjacent systems (AWS, Slack, Halo)
+  * Access requirements by feature:
+    * Scans and events to S3
+      * Halo read-only API keys (general requirement for basic Cortex operation-
+        see table below)
+      * Target S3 buckets (`SCANS_S3_BUCKET`, `EVENTS_S3_BUCKET`) for receiving
+      scans and events must exist; this integration does not create S3 buckets.
+      * API keys must be able to create and update files in target S3 buckets.
+    * Halo EC2 Delta reporter
+      * Read-only Halo API keys (general requirement for basic Cortex operation-
+        see table below)
+      * AWS API keys must be able to read EC2 metadata. For scanning multiple
+        accounts, read the [implementation notes](https://github.com/cloudpassage/ec2-halo-delta#implementation-notes)
+    * Quarantine, IP Blocker:
+      * Halo administrative-level API keys are required for both Quarantine and IP Blocker (see `HALO_API_KEY_RW` and `HALO_API_SECRET_KEY_RW`, below).
+      * Duplicated group names are not supported for monitored or quarantine group.  See [Quarantine docs](https://github.com/cloudpassage/don-bot/blob/master/QUARANTINE.md)
+      * Duplicated group names for monitored groups in IP Blocker configuration are not
+      supported.  See [IP Blocker documentation](https://github.com/cloudpassage/don-bot/blob/master/IP_BLOCKER.md)
+      for details.
+    * Slack integration
+      * CloudPassage Halo read-only API keys (a default requirement for basic Cortex operation)
+      * A [Slack bot user API token](https://api.slack.com/docs/token-types#bot)
+      is required to enable don-bot.
 
-### Use
 
-* Clone this repository
-* Navigate to the root directory of this repository
+### Setup and Use
+
+* Create a virtual machine or cloud instance for hosting Cortex, which meets or
+exceeds instance sizing in `Requirements`, above.
+* Install [docker-ce](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
+and [docker-compose](https://docs.docker.com/compose/install/) on the Cortex
+instance you just created.
+* Use git to clone this repository into the Cortex instance.
+* Navigate to the root directory of the cloned repository.
 * Set these environment variables:
 
 | Variable               | Purpose                                             |
@@ -73,27 +105,123 @@ sense for your environment, using your favorite automation tools.
 | AWS_SECRET_ACCESS_KEY  | Secret key corresponding to AWS_ACCESS_KEY_ID       |
 | AWS_ROLE_NAME          | (Optional) Role to assume via STS, for cross-account inventory.|
 | AWS_ACCOUNT_NUMBERS    | (Optional) Semicolon-delimited list of account numbers having `AWS_ROLE_NAME` |
-| SCANS_S3_BUCKET        | Name of S3 bucket for scan archive                  |
-| EVENTS_S3_BUCKET       | Name of S3 bucket for events archive                |
 | HALO_API_KEY           | Read-only API key for Halo                          |
 | HALO_API_SECRET_KEY    | Secret corresponding to HALO_API_KEY                |
-| HALO_API_KEY_RW        | Read-Write API key for Halo                         |
-| HALO_API_SECRET_KEY_RW | Secret corresponding to HALO_API_KEY_RW             |
-| SLACK_API_TOKEN        | API token for Slack                                 |
-| SLACK_CHANNEL          | Channel Donbot should join and listen. Donbot will not interact with anyone who is not a member of this channel. |
+| HALO_API_KEY_RW        | Read-Write API key for Halo (Only required if you're using IP-Blocker and Quarantine) |
+| HALO_API_SECRET_KEY_RW | Secret corresponding to HALO_API_KEY_RW (Only required if you're using IP-Blocker and Quarantine) |
+| SLACK_API_TOKEN        | (optional) API token for Slack                      |
+| SLACK_CHANNEL          | (optional) Channel Donbot should join and listen. Donbot will not interact with anyone who is not a member of this channel. |
 | HTTPS_PROXY_URL        | If server routes through a proxy. Format is ip:port |
 
-* For more information on `AWS_ROLE_NAME` and `AWS_ACCOUNT_NUMBERS` settings, refer to
-https://github.com/cloudpassage/ec2-halo-delta
+* For more information on `AWS_ROLE_NAME` and `AWS_ACCOUNT_NUMBERS` settings,
+refer to https://github.com/cloudpassage/ec2-halo-delta
 
-* In project don-bot (https://github.com/cloudpassage/don-bot)
-
-  - Confirm that the configuration for ip blocker and quarantine in
-`cortex_conf.yml` matches your environment, especially regarding
-group names, ip list names, and event types.
+* Confirm that the configuration for ip blocker and quarantine in
+`cortex_conf.yml` (found in the root directory of this repository) matches your
+environment's requirements, especially regarding group names, ip list names, and
+event types.
 
 * As a user who has sufficient access to run Docker containers:
 `docker-compose --compatibility up -d --build`
+
+### Scheduler Configuration
+
+Cortex has a built-in task scheduler for performing regular batch-type
+integrations. Two such task definitions are included with Cortex, and are
+very easy and straightforward to configure:
+
+* `scheduled_events_to_s3.conf`
+  * Copy the `scheduled_events_to_s3.conf` file from `config/available/` to the
+  `config/enabled/` directory.
+  * Open the `config/enabled/scheduled_events_to_s3.conf` file with your
+  favorite editor and set the value for `AWS_S3_BUCKET` to the name of the
+  S3 bucket you would like to send your Halo events to.
+  * Finally, restart the Cortex scheduler by running `docker restart scheduler`.
+  * Confirm that the scheduler picked up the configuration by running
+  `docker logs scheduler` and looking for the task's configuration to be
+  printed. (see below section on scheduler logs)
+
+* `scheduled_scans_to_s3.conf`
+  * Same process as `scheduled_events_to_s3.conf`; both configuration files are
+  nearly identical. Copy the file to `config/enabled/`, set the `AWS_S3_BUCKET`
+  variable, and restart the scheduler, as described above.
+
+When examining scheduler startup logs (docker logs scheduler) to confirm the
+correct consumption of scheduled task configuration, this is similar to what
+you'll see:
+
+```
+
+ConfigManager: Parsing config file: /etc/config/scheduled_events_to_s3.conf
+ConfigManager: Parsing config file: /etc/config/scheduled_scans_to_s3.conf
+Scheduled tasks:
+Task: scans_to_s3
+Container image: docker.io/halotools/halo-scans-archiver:feature_CS-554
+Retries: 5
+Schedule:
+	Minute: 01
+	Hour: 12
+	Day of week: *
+	Day of month: *
+	Month of year: *
+===
+Task: events_to_s3
+Container image: docker.io/halotools/halo-events-archiver:feature_CS-555
+Retries: 5
+Schedule:
+	Minute: 01
+	Hour: 12
+	Day of week: *
+	Day of month: *
+	Month of year: *
+
+```
+
+Notice that the ConfigManager parses two config files in the above example,
+then prints the basic task configuration for both.  This output is useful to
+confirm the correct consumption of basic task configuration. Any files which
+are found in the `config/enabled/` directory which don't contain the correct
+configuration sections will be ignored.
+
+### Monitoring Cortex's scheduled tasks
+
+A CloudPassage Log-Based IDS (LIDS) policy is included in this repository to
+enable logging and alerting for failed scheduled tasks.
+
+In order to enable this functionality, a few more configuration steps must be
+performed:
+
+* Configure Docker to log to journald
+  * In order for 'docker logs CONTAINER_NAME' to work, and to get container
+  logs to syslog where the Halo agent can detect events, we must first direct
+  all container logs to journald.
+  * Instructions here: https://docs.docker.com/config/containers/logging/journald/
+* Configure journald to log to syslog
+  * In order for the container log messages to be available to the Halo agent,
+  we must send these log messages to a file.
+  * We will configure journald to forward log messages to syslog. See
+  https://www.freedesktop.org/software/systemd/man/journald.conf.html for
+  information on using the journald.conf file to customize journald's behavior.
+  Hint: `ForwardToSyslog` is the setting to enable.
+  * Once `ForwardToSyslog` has been enabled, restart the journald service with
+  `service systemd-journald restart`
+  * On Ubuntu 16.04, the file which will contain the container log messages is
+  `/var/log/messages`
+* Install the Halo agent on the instance hosting Cortex
+  * Installing the Halo agent:
+  https://support.cloudpassage.com/hc/en-us/articles/228558687-Installing-Halo-Agents
+* Install the LIDS policy to monitor Cortex scheduler logs with Halo
+  * Download the policy file from this repository, located at
+  `policies/cortex-scheduler.json`
+  * Log into Halo and click on `Policies`
+  * Click on `Actions > Import Policy`
+  * Browse to and select the policy file you downloaded, and click
+  `Import Policies`
+  * In the Halo portal, navigate to the server group containing the host
+  running Cortex. Edit the group's settings and assign the LIDS policy you just
+  uploaded.
+
+
 
 ### Using without Slack
 

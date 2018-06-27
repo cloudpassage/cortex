@@ -1,8 +1,8 @@
 version: '3.4'
 x-halocelery_version:
-  &default_halocelery_version docker.io/halotools/halocelery:v0.7.0
+  &default_halocelery_version docker.io/halotools/halocelery:v0.8
 x-donbot_version:
-  &default_donbot_version docker.io/halotools/don-bot:v0.18.0
+  &default_donbot_version docker.io/halotools/don-bot:v0.19
 x-celery_env_vars:
   &default_celery_env_vars
   CELERY_BACKEND_URL: redis://redis
@@ -11,8 +11,14 @@ x-celery_env_vars:
 x-proxy_env_vars:
   &default_proxy_env_vars
   HTTPS_PROXY: ${HTTPS_PROXY_URL}
+x-api_env_vars:
+  &default_api_env_vars
+  HALO_API_HOSTNAME: api.cloudpassage.com
 
 services:
+#####################################
+# Rabbitmq service
+#####################################
   rabbitmq:
     container_name: rabbitmq
     hostname: rabbitmq
@@ -28,6 +34,9 @@ services:
       - redis
     networks:
       - cortex
+#####################################
+# Flower service
+#####################################
   flower:
     container_name: flower
     image: *default_halocelery_version
@@ -39,14 +48,6 @@ services:
     environment:
       << : *default_celery_env_vars
       << : *default_proxy_env_vars
-####################################
-#    Flower doesn't use SSL, so only enable this in a controlled
-#    troubleshooting environment.  DON-BOT can list tasks for you with
-#    "donbot tasks"
-#
-#    ports:
-#      - "5555:5555"
-####################################
     restart: always
     read_only: true
     depends_on:
@@ -56,6 +57,9 @@ services:
       - "redis:6379"
     networks:
       - cortex
+#####################################
+# Celeryworker service
+#####################################
   celeryworker:
     container_name: celeryworker
     image: *default_halocelery_version
@@ -63,31 +67,20 @@ services:
       resources:
         limits:
           memory: 256M
-    command: celery worker -A halocelery -l INFO
+    command: unbuffer celery worker -A halocelery -l INFO
     user: root
     restart: always
     environment:
       << : *default_celery_env_vars
       << : *default_proxy_env_vars
-
-#####################################
-# API keys, account information
-#####################################
+      << : *default_api_env_vars
       HALO_API_KEY: ${HALO_API_KEY}
       HALO_API_SECRET_KEY: ${HALO_API_SECRET_KEY}
       HALO_API_KEY_RW: ${HALO_API_KEY_RW}
       HALO_API_SECRET_KEY_RW: ${HALO_API_SECRET_KEY_RW}
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
-      AWS_ROLE_NAME: ${AWS_ROLE_NAME}
-      AWS_ACCOUNT_NUMBERS: ${AWS_ACCOUNT_NUMBERS}
-#####################################
-# Container image versions
-#####################################
-      EC2_HALO_DELTA_VERSION: v0.1
-      FIREWALL_GRAPH_VERSION: 0.1.1
-      SCANS_TO_S3_VERSION: v0.17
-      EVENTS_TO_S3_VERSION: v0.10
+      SLACK_API_TOKEN: ${SLACK_API_TOKEN}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     depends_on:
@@ -97,6 +90,9 @@ services:
       - "redis:6379"
     networks:
       - cortex
+#####################################
+# Redis service
+#####################################
   redis:
     container_name: redis
     image: docker.io/redis:3-alpine
@@ -109,6 +105,9 @@ services:
     restart: always
     networks:
       - cortex
+#####################################
+# Scheduler service
+#####################################
   scheduler:
     container_name: scheduler
     image: *default_halocelery_version
@@ -116,31 +115,25 @@ services:
       resources:
         limits:
           memory: 256M
-    command: celery beat -A halocelery -l INFO
+    command: unbuffer celery beat -A halocelery -l INFO --pidfile=
     restart: always
     depends_on:
       - celeryworker
     links:
       - "rabbitmq:5672"
       - "redis:6379"
-      - "flower:5555"
     environment:
       << : *default_celery_env_vars
       << : *default_proxy_env_vars
-      EVENT_EXPORT_HOUR: 19
-      EVENT_EXPORT_MIN: 21
-      SCAN_EXPORT_HOUR: 19
-      SCAN_EXPORT_MIN: 21
       FLOWER_HOST: http://flower:5555
-      SLACK_API_TOKEN: ${SLACK_API_TOKEN}
-      SLACK_CHANNEL: ${SLACK_CHANNEL}
-      MONITOR_EVENTS: "yes"
-      ARCHIVE_SCANS: "yes"
-      SCANS_S3_BUCKET: ${SCANS_S3_BUCKET}
-      ARCHIVE_EVENTS: "yes"
-      EVENTS_S3_BUCKET: ${EVENTS_S3_BUCKET}
+      HALOCELERY_CONFIG_DIR: /etc/config/
+    volumes:
+      - "./config/enabled/:/etc/config/"
     networks:
       - cortex
+#####################################
+# Donbot service
+#####################################
   donbot:
     container_name: don-bot
     image: *default_donbot_version
@@ -161,6 +154,7 @@ services:
     environment:
       << : *default_celery_env_vars
       << : *default_proxy_env_vars
+      << : *default_api_env_vars
       # NOSLACK: "true"
       FLOWER_HOST: http://flower:5555
       HALO_API_KEY: ${HALO_API_KEY}
@@ -169,13 +163,17 @@ services:
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
       SLACK_API_TOKEN: ${SLACK_API_TOKEN}
       SLACK_CHANNEL: ${SLACK_CHANNEL}
+      AWS_ROLE_NAME: ${AWS_ROLE_NAME}
+      AWS_ACCOUNT_NUMBERS: ${AWS_ACCOUNT_NUMBERS}
       MONITOR_EVENTS: "yes"
-      ARCHIVE_SCANS: "yes"
-      SCANS_S3_BUCKET: ${SCANS_S3_BUCKET}
-      ARCHIVE_EVENTS: "yes"
-      EVENTS_S3_BUCKET: ${EVENTS_S3_BUCKET}
+      #####################################
+      # Donbot's containerized task image versions
+      #####################################
+      EC2_HALO_DELTA_VERSION: v0.2
+      FIREWALL_GRAPH_VERSION: v0.2
     networks:
       - cortex
+
 networks:
   cortex:
     driver: bridge
