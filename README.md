@@ -243,3 +243,8 @@ The use of journald for logging in Docker is strongly encouraged. The containers
 in this application produce verbose logs, and it is best to send them to
 journald instead of the default Docker logging mechanism. Instructions for
 configuring Docker's logging driver can be found [here](https://docs.docker.com/engine/admin/logging/journald/#usage).
+
+<!---
+#CPTAGS:community-supported integration automation
+#TBICON:images/python_icon.png
+-->
